@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Receipt - {{ student.name }}</title>
+    <style>
+        body { font-family: 'Courier New', Courier, monospace; padding: 30px; color: #333; }
+        .receipt-box { max-width: 600px; margin: auto; border: 2px solid #eee; padding: 20px; border-radius: 10px; }
+        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .details { margin-top: 20px; line-height: 2; }
+        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #777; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body onload="window.print()"> <div class="receipt-box">
+        <div class="header">
+            <h2>{{ teacher.name }}'s Coaching</h2>
+            <p>Bhopal, MP | Contact: {{ teacher.phone or 'N/A' }}</p>
+            <h3>FEES RECEIPT</h3>
+        </div>
+        
+        <div class="details">
+            <p><strong>Receipt No:</strong> #{{ record.id }}</p>
+            <p><strong>Date:</strong> {{ record.date_paid.strftime('%d-%m-%Y') }}</p>
+            <p><strong>Student Name:</strong> {{ student.name }}</p>
+            <p><strong>Month:</strong> {{ record.month }}</p>
+            <p><strong>Amount Paid:</strong> ₹{{ record.amount }}</p>
+            <p><strong>Payment Status:</strong> PAID (CASH)</p>
+        </div>
+
+        <div class="footer">
+            <p>This is a computer-generated receipt.</p>
+            <p>Thank you for your payment!</p>
+        </div>
+    </div>
+    
+    <div class="no-print" style="text-align:center; margin-top:20px;">
+        <button onclick="window.print()">Print Again</button>
+        <button onclick="window.close()">Close Tab</button>
+    </div>
+</body>
+</html>

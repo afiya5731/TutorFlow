@@ -1,0 +1,777 @@
+/* General Styling */
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* This pushes the footer to the bottom */
+.content-wrapper {
+    flex: 1 0 auto;
+}
+
+footer {
+    width: 100%;
+    background-color: #212529;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    bottom: 0;
+    position: fixed;
+}
+
+/* Hero Section Customization */
+header.bg-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+}
+
+/* Tutor Card Enhancements */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 12px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.badge.bg-success {
+    font-weight: 500;
+    padding: 0.5em 0.8em;
+}
+
+/* Button Styling */
+.btn-warning {
+    font-weight: bold;
+    color: #fff;
+}
+
+.btn-warning:hover {
+    color: #fff;
+    background-color: #e0a800;
+}
+
+/* Registration Card */
+.card-header {
+    border-top-left-radius: 12px !important;
+    border-top-right-radius: 12px !important;
+}
+
+/* Dashboard Specific Styling */
+.dashboard-container {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    padding-top: 50px;
+}
+
+/* Sidebar-like Header */
+.dash-header {
+    background: #212529;
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Leads Table */
+.table-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+}
+
+.table thead {
+    background-color: #4e73df;
+    color: white;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.table th, .table td {
+    padding: 1.2rem;
+    vertical-align: middle;
+}
+
+/* Status Badges */
+.status-pill {
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    border: 1px solid #bbdefb;
+}
+
+/* Phone Number Styling */
+.phone-link {
+    color: #2e7d32;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.phone-link:hover {
+    text-decoration: underline;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+}
+
+/* Login specific refinements */
+.form-control-lg {
+    border-radius: 10px;
+    font-size: 1rem;
+    border: 2px solid #eee;
+}
+
+.form-control-lg:focus {
+    border-color: #4e73df;
+    box-shadow: none;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #2e59d9;
+    transform: translateY(-2px);
+}
+
+/* Navbar Button Styling */
+.btn-outline-info {
+    color: #0dcaf0;
+    border-color: #0dcaf0;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-info:hover {
+    background-color: #0dcaf0;
+    color: #000;
+}
+
+/* Ensure buttons don't look cramped on mobile */
+@media (max-width: 991px) {
+    .navbar-nav .nav-item {
+        margin-bottom: 8px;
+        
+    }
+}
+
+/* Review Slideshow Customization */
+#reviewCarousel {
+    padding: 20px 0;
+}
+
+.carousel-item .card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    background-size: 50%;
+}
+
+.lead {
+    font-size: 1.1rem;
+    color: #555;
+    font-style: italic;
+}
+
+/* Why Choose Section Styling */
+.card {
+    border-radius: 15px !important;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+}
+
+/* Ensure icons are centered */
+.bi {
+    line-height: 1;
+}
+
+/* Custom Purple for Join Now button */
+.btn-primary {
+    transition: opacity 0.3s;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+
+.justify-content {
+    text-align: justify;
+    text-justify: inter-word;
+    line-height: 1.6; /* Adds breathing room between lines */
+    hyphens: auto;    /* Allows words to break at the end of lines if needed */
+    margin-bottom: 0;
+}
+
+
+
+@keyframes pulse-icon {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Glassmorphism subtle background (Optional) */
+.bg-white.shadow-sm.rounded {
+    backdrop-filter: blur(5px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
+} 
+
+/* Animation for Value Cards in About Us */
+.hover-grow {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: default;
+}
+
+.hover-grow:hover {
+    /* Slightly enlarges the div by 5% */
+    transform: scale(1.05); 
+    /* Adds a deeper shadow to make it look like it's lifting off the page */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15) !important;
+    background-color: #ffffff;
+    z-index: 2; /* Ensures it stays above other elements while enlarged */
+}
+
+
+.student-card {
+    background: #ffffff;
+    border-radius: 20px; /* Rounded corners */
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth enlargement */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.student-card:hover {
+    transform: translateY(-5px) scale(1.03); /* Enlarges a bit */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    cursor: pointer;
+}
+
+.fee-status-paid { color: #28a745; font-weight: bold; }
+.fee-status-unpaid { color: #dc3545; font-weight: bold; }
+
+
+/* Mobile adjustments */
+@media (max-width: 576px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    .card-body {
+        padding: 1.5rem !important; /* Smaller padding on mobile */
+    }
+    .hover-grow:hover {
+        transform: none !important; /* Disable hover grow on touch devices to avoid glitches */
+    }
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+    /* Hide Desktop Sidebar */
+    .sidebar { display: none; }
+    .dashboard-wrapper { display: block; }
+    .main-content { padding: 1rem 1rem 80px 1rem; } /* Bottom space for nav */
+
+    /* Floating Bottom Navbar */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: #ffffff;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        z-index: 1000;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+    }
+
+    .nav-item {
+        text-align: center;
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 10px;
+        flex: 1;
+        transition: 0.3s;
+    }
+
+    .nav-item i { font-size: 1.4rem; display: block; }
+    .nav-item.active { color: #0d6efd; }
+
+    /* BIG CENTER ADD BUTTON */
+    .nav-item-center {
+        position: relative;
+        top: -25px; /* Floating look */
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white !important;
+        box-shadow: 0 8px 15px rgba(13, 110, 253, 0.4);
+        border: 4px solid #f8f9fa;
+    }
+
+    .nav-item-center i { font-size: 1.8rem; margin: 0; }
+    
+    /* Stat Cards Stack */
+    .stat-card { margin-bottom: 10px; }
+}
+
+/* Desktop View Hide Bottom Nav */
+@media (min-width: 769px) {
+    .bottom-nav { display: none; }
+}
+
+
+
+/* --- Desktop Default (Aapka Original Code) --- */
+.dashboard-wrapper { display: flex; min-height: 100vh; }
+.sidebar { width: 250px; background-color: #2c3e50; color: white; display: flex; flex-direction: column; transition: 0.3s; }
+
+/* --- Mobile-Friendly Overhaul (max-width: 768px) --- */
+@media (max-width: 768px) {
+    /* 1. Sidebar ko Bottom Navbar mein badalna */
+    .sidebar {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        width: 100% !important;
+        height: 70px !important;
+        flex-direction: row !important;
+        z-index: 2000;
+        border-radius: 25px 25px 0 0;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+    }
+    .sidebar-header, .sidebar-footer { display: none !important; } /* Mobile par logo/logout hide */
+    
+    .sidebar-nav {
+        display: flex !important;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
+        padding: 0 !important;
+    }
+    
+    .sidebar-nav a {
+        flex-direction: column;
+        padding: 5px !important;
+        font-size: 10px;
+        border-left: none !important;
+        color: rgba(255,255,255,0.6);
+        text-align: center;
+    }
+    .sidebar-nav a i { font-size: 1.4rem; margin-bottom: 2px; margin-right: 0 !important; }
+    .sidebar-nav a.active { background: none; color: #fff; border-bottom: 3px solid #0d6efd; }
+
+    /* 2. Main Content & Header Adjustments */
+    .main-content { padding: 1rem 1rem 90px 1rem !important; width: 100%; }
+    header.d-flex { flex-direction: column; text-align: center; gap: 10px; }
+    header h1 { font-size: 1.6rem; }
+
+    /* 3. Floating Stats Cards (Side-by-side & Up-down) */
+    .stat-card {
+        border-radius: 25px !important; /* Round Divs */
+        margin-bottom: 15px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
+        transition: transform 0.3s;
+    }
+    /* Mobile par cards ko thoda "floating" feel dene ke liye */
+    .col-md-4 { width: 100%; } 
+    /* Agar aap chahte hain 2 cards side-by-side aayein mobile par: */
+    .row.g-3 > div:nth-child(2), .row.g-3 > div:nth-child(3) {
+        width: 50%;
+        display: inline-block;
+    }
+
+    /* 4. Attendance Circular Chart Adjustments */
+    .circular-chart { width: 100px !important; height: 100px !important; }
+    
+    /* 5. Table Fixes */
+    .table-responsive { border: none !important; }
+    .table td, .table th { font-size: 0.85rem; }
+}
+
+/* --- Desktop Par Sidebar waisa hi rahega --- */
+@media (min-width: 769px) {
+    .sidebar-nav { display: block; }
+}
+@media (min-width: 769px) { .bottom-nav { display: none !important; } }
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 768px) {
+    .bottom-nav {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        height: 75px; background: #fff;
+        display: flex; justify-content: space-around; align-items: center;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.08);
+        z-index: 9999;
+        border-top-left-radius: 25px; border-top-right-radius: 25px;
+    }
+    .nav-item { text-align: center; color: #a1a1a1; text-decoration: none; flex: 1; }
+    .nav-item i { font-size: 1.5rem; display: block; }
+    .nav-item span { font-size: 0.7rem; font-weight: 600; }
+    .nav-item.active { color: #0d6efd; } /* Blue for active page */
+
+    .nav-item-center {
+        position: relative; top: -30px;
+        background: #000; width: 60px; height: 60px; border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        color: white !important; border: 5px solid #f1f3f6;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* --- 1. THEME VARIABLES (A to Z Control) --- */
+:root {
+    /* Light Theme (Default - Apple/Glass Style) */
+    --bg-body: #f4f7fe;
+    --sidebar-bg: #ffffff;
+    --sidebar-text: #4b5563;
+    --sidebar-active-bg: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    --text-main: #1f2937;
+    --text-muted: #9ca3af;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --border-color: rgba(0, 0, 0, 0.05);
+    --glass-blur: blur(10px);
+}
+
+[data-theme="dark"] {
+    /* Dark Theme (Premium Glassmorphism) */
+    --bg-body: #060b13;
+    --sidebar-bg: #0f172a;
+    --sidebar-text: #94a3b8;
+    --sidebar-active-bg: linear-gradient(135deg, #38bdf8 0%, #1d4ed8 100%);
+    --text-main: #f1f5f9;
+    --text-muted: #64748b;
+    --card-bg: rgba(30, 41, 59, 0.5);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --glass-blur: blur(15px);
+}
+
+
+
+/* --- DARK MODE TYPOGRAPHY RESET --- */
+[data-theme="dark"] h1, 
+[data-theme="dark"] h3, 
+[data-theme="dark"] h4, 
+[data-theme="dark"] h5, 
+[data-theme="dark"] h6,
+[data-theme="dark"] .display-6,
+[data-theme="dark"] b,
+[data-theme="dark"] strong {
+    color: #ffffff !important; /* Saari headings white ho jayengi */
+}
+
+
+/* Bootstrap ki 'text-dark' aur 'text-muted' classes ko override karein */
+[data-theme="dark"] .text-dark {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: #94a3b8 !important;
+}
+
+/* Card titles aur stats specifically */
+[data-theme="dark"] .stat-value {
+    color: #ffffff !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* --- DARK MODE ELEMENT OVERRIDES --- */
+[data-theme="dark"] .bg-white, 
+[data-theme="dark"] .card-body,
+[data-theme="dark"] .table-responsive,
+[data-theme="dark"] .form-control {
+    background-color: rgba(255, 255, 255, 0.05) !important; /* White ko transparent dark kar dega */
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 1. Search Box Fix (Jo white dikh raha hai) */
+[data-theme="dark"] .input-group, 
+[data-theme="dark"] input[type="text"] {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 2. Table Rows Fix (Striped lines agar white hain) */
+[data-theme="dark"] .table {
+    background-color: transparent !important;
+}
+
+[data-theme="dark"] .table tr, 
+[data-theme="dark"] .table td {
+    background-color: transparent !important;
+    color: #cbd5e1 !important; /* Text soft white ho jayega bina color change kiye */
+    border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 3. Status Badges Fix (Unpaid/Paid wale boxes) */
+[data-theme="dark"] .badge.bg-light,
+[data-theme="dark"] .status-badge {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+/* 4. White Large Container Fix (Jo main table ke piche hai) */
+[data-theme="dark"] .main-card-container, 
+[data-theme="dark"] .shadow-sm.bg-white {
+    background-color: var(--card-bg) !important; /* Hamari glass wali theme apply hogi */
+    backdrop-filter: blur(10px);
+}
+
+
+
+
+
+
+
+
+
+/* --- TABLE SPECIFIC DARK MODE FIX --- */
+[data-theme="dark"] .table, 
+[data-theme="dark"] .table-responsive,
+[data-theme="dark"] .table > :not(caption) > * > * {
+    background-color: transparent !important; /* Table ke har cell ka white background khatam */
+    color: #ffffff !important; /* Text ko white force karein */
+    border-color: rgba(255, 255, 255, 0.1) !important; /* Borders ko soft white karein */
+}
+
+/* Striped Rows Fix (Jo ek chor kar ek white line aati hai) */
+[data-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    color: #ffffff !important;
+}
+
+/* Hover Effect Fix */
+[data-theme="dark"] .table-hover>tbody>tr:hover>* {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: #ffffff !important;
+}
+
+/* Table Card Wrapper Fix */
+[data-theme="dark"] .card-body, 
+[data-theme="dark"] .bg-white {
+    background-color: var(--card-bg) !important; /* Hamari glass theme apply hogi */
+    backdrop-filter: blur(10px);
+}
+
+/* Button & Badge Visibility in Table */
+[data-theme="dark"] .badge.bg-light {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Search Input Box (Jo table ke upar white hai) */
+[data-theme="dark"] .form-control, 
+[data-theme="dark"] .input-group-text {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+}
+
+
+
+/* --- DARK MODE TABLE FORCE-FIX --- */
+[data-theme="dark"] .table-responsive {
+    background: transparent !important;
+}
+
+[data-theme="dark"] .table {
+    color: #ffffff !important;
+}
+
+/* Bootstrap ki 'text-dark' zidd khatam karne ke liye */
+[data-theme="dark"] .text-dark {
+    color: #ffffff !important;
+}
+
+/* Input boxes (Fees input) ko dark mode mein readable banana */
+[data-theme="dark"] .form-control {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+/* Receipt Buttons logic */
+[data-theme="dark"] .btn-outline-dark {
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+[data-theme="dark"] .btn-outline-dark:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Row separation borders */
+[data-theme="dark"] .student-row.border-bottom {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* N/A text color */
+[data-theme="dark"] .text-muted.italic {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* --- ATTENDANCE SIDE-PANEL DARK MODE --- */
+[data-theme="dark"] .attendance-side-panel .card,
+[data-theme="dark"] .student-item {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+}
+
+/* Date input box inside attendance panel */
+[data-theme="dark"] #attendance-date {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Student name and grade visibility */
+[data-theme="dark"] .student-item h6,
+[data-theme="dark"] .student-item .fw-bold,
+[data-theme="dark"] .student-item .text-dark {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .student-item .text-muted {
+    color: #94a3b8 !important; /* Soft grey for grade/subtitle */
+}
+
+/* Hover effect for student selection */
+[data-theme="dark"] .student-item:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: #6366f1 !important; /* Indigo glow on hover */
+    transform: translateX(8px);
+}
+
+/* Active/Clicked Student state (If you add an 'active' class via JS) */
+[data-theme="dark"] .student-item.active {
+    background: rgba(99, 102, 241, 0.2) !important;
+    border-color: #6366f1 !important;
+}
+
+
+
+

@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Login | TutorFlow Premium{% endblock %}
+
+{% block extra_css %}
+
+    <style>
+        :root[data-bs-theme="light"] {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(241, 245, 249, 1);
+            --input-bg: #ffffff;
+            --shadow-glow: rgba(99, 102, 241, 0.05);
+            --link-color: #6366f1;
+        }
+
+        :root[data-bs-theme="dark"] {
+            --bg-gradient: radial-gradient(circle at top right, #1e1b4b 0%, #09090b 100%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(20, 20, 25, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(15, 15, 20, 0.6);
+            --shadow-glow: rgba(168, 85, 247, 0.15);
+            --link-color: #a855f7;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Consistent Glass Navbar */
+        .glass-nav {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 15px 0;
+        }
+
+        .text-main {
+            color: var(--text-main) !important;
+        }
+
+        .theme-toggle-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 100px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-nav-accent {
+            border: 1px solid #06b6d4 !important;
+            background: rgba(6, 182, 212, 0.05) !important;
+            color: #06b6d4 !important;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+
+        .modal-content-glass {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 16px !important;
+        }
+
+        /* Glassmorphic Login Card Component */
+        .glass-login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .glass-login-card:hover {
+            box-shadow: 0 25px 50px var(--shadow-glow);
+        }
+
+        .input-glass {
+            background: var(--input-bg) !important;
+            border: 1px solid var(--glass-border) !important;
+            color: var(--text-main) !important;
+            padding: 14px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .input-glass:focus {
+            border-color: var(--link-color);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+        }
+
+        .btn-glow-login {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white !important;
+            font-weight: 700;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .btn-glow-login:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+        }
+
+        .brand-accent {
+            color: var(--link-color);
+            font-weight: 700;
+        }
+
+        .icon-header-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: white;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.25);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
+        <div class="row justify-content-center w-100">
+            <div class="col-11 col-sm-9 col-md-7 col-lg-5 col-xl-4">
+                
+                <div class="glass-login-card shadow-sm">
+                    <div class="icon-header-circle">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    
+                    <h3 class="fw-bold text-center mb-1" style="letter-spacing:-0.02em;">Tutor Portal</h3>
+                    <p class="text-center text-muted small mb-4">Login to manage your Coaching / Tution </p>
+                    
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{% if category == 'danger' %}danger{% elif category == 'warning' %}warning{% else %}success{% endif %} alert-dismissible fade show border-0 mb-4" role="alert" 
+                                     style="background: {% if category == 'danger' %}rgba(239, 68, 68, 0.15){% elif category == 'warning' %}rgba(245, 158, 11, 0.15){% else %}rgba(99, 102, 241, 0.15){% endif %}; 
+                                            color: {% if category == 'danger' %}#f87171{% elif category == 'warning' %}#fbbf24{% else %}#818cf8{% endif %}; 
+                                            border-radius: 16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05) !important;">
+                                    <div class="d-flex align-items-center gap-2 small fw-bold">
+                                        {% if category == 'danger' %}
+                                            <i class="bi bi-exclamation-octagon-fill"></i>
+                                        {% elif category == 'warning' %}
+                                            <i class="bi bi-exclamation-triangle-fill"></i>
+                                        {% else %}
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        {% endif %}
+                                        <span>{{ message }}</span>
+                                    </div>
+                                    <button type="button" class="btn-close {% if category != 'warning' %}btn-close-white{% endif %}" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.75rem;"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form action="/teacher-login" method="POST">
+                        <div class="mb-3">
+                            <label class="small fw-bold mb-2 text-main">Registered Email </label>
+                            <input type="email" name="email" class="form-control input-glass" placeholder="name@email.com"  value="" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="small fw-bold mb-2 text-main">Password </label>
+                            <input type="password" name="password" class="form-control input-glass" autocomplete="new-password" value="" placeholder="" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-glow-login w-100 py-3">
+                            Login &rarr;
+                        </button>
+                    </form>
+                    
+                    <div class="text-center mt-4 text-muted small">
+                        New Tutor? <a href="/register" class="brand-accent text-decoration-none ms-1">Register here</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Manage Subscription | TutorFlow{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- PAGE TITLE HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0">Subscription & Billing</h2>
+            <p class="text-muted small">Manage your active TutorFlow subscription plan and invoice history</p>
+        </div>
+        <a href="/pricing" class="btn btn-outline-glass text-muted rounded-pill px-3 btn-sm fw-bold">
+            <i class="bi bi-arrow-up-right-circle me-1"></i> View All Plans
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- CURRENT PLAN STATUS CARD -->
+        <div class="col-lg-7">
+            <div class="glass-card p-4 h-100 position-relative overflow-hidden" style="border: 1px solid rgba(168, 85, 247, 0.4) !important;">
+                
+                <!-- PRO EDUCATOR ACTIVE BADGE -->
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <span class="badge rounded-pill px-3 py-2 mb-2 fw-bold" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4);">
+                            ⚡ CURRENTLY ACTIVE
+                        </span>
+                        <h3 class="fw-bold m-0 text-main">{{ plan }}</h3>
+                    </div>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1 fs-6">
+                        <i class="bi bi-check-circle-fill me-1"></i> {{ status }}
+                    </span>
+                </div>
+
+                <p class="text-muted small mb-4">
+                    Your coaching account has full access to unlimited students, automated PDF fee receipts, WhatsApp notifications, and notice broadcasts.
+                </p>
+
+                <!-- RENEWAL INFO BOX -->
+<!-- RENEWAL INFO BOX -->
+<div class="p-3 rounded-4 mb-4" style="background: var(--input-bg); border: 1px solid var(--border-color);">
+    <div class="row g-3 text-center text-md-start">
+        <div class="col-md-6">
+            <small class="text-muted d-block">Billing Cycle</small>
+            <strong class="fs-6 text-main">{{ billing_cycle }}</strong>
+        </div>
+        <div class="col-md-6">
+            <small class="text-muted d-block">Next Auto-Renewal Date</small>
+            <strong class="fs-6 text-purple">{{ renewal_date }}</strong>
+        </div>
+    </div>
+</div>
+
+                <!-- PLAN INCLUDED FEATURES -->
+                <h6 class="fw-bold mb-3">Active Pro Features:</h6>
+                <div class="row g-2 mb-4">
+                    <div class="col-md-6">
+                        <small class="text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-purple"></i> Unlimited Batch & Student Records
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-purple"></i> Branded PDF Fee Receipts
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-purple"></i> Smart WhatsApp Integration
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-flex align-items-center gap-2">
+                            <i class="bi bi-check-circle-fill text-purple"></i> Priority Directory Listing
+                        </small>
+                    </div>
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <form action="/update-subscription-plan" method="POST" class="d-flex gap-2">
+                    {% if status == 'Active' %}
+                        <button type="submit" name="action" value="cancel" class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold">
+                            Cancel Auto-Renewal
+                        </button>
+                    {% else %}
+                        <button type="submit" name="action" value="renew" class="btn btn-primary-grad btn-sm rounded-pill px-4 fw-bold">
+                            Re-activate Subscription
+                        </button>
+                    {% endif %}
+                </form>
+
+            </div>
+        </div>
+
+        <!-- UPGRADE TO CUSTOM APP / SUPPORT BOX -->
+        <div class="col-lg-5">
+            <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="rounded-4 p-3 d-inline-block mb-3" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;">
+                        <i class="bi bi-phone-vibrate-fill fs-3"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2">Need Your Own Mobile App?</h4>
+                    <p class="text-muted small mb-3">
+                        Upgrade from <strong>Pro Educator</strong> to a fully custom-branded Android App & Web Portal customized specifically with your coaching center logo and name!
+                    </p>
+                </div>
+                <a href="/contact" class="btn btn-primary-grad py-3 w-100 rounded-pill fw-bold text-center text-decoration-none">
+                    Request Custom Institute App &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
