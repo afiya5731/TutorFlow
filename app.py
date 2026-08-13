@@ -19,10 +19,10 @@ db = SQLAlchemy(app)
 
 
 # --- FIXED DATABASE CONFIGURATION WITH SSL & CORRECT USERNAME ---
-#db_url = "postgresql://tutorfinder_db:lUMQ1Hg0hD8vGOQUAT19fen4bmt8MBqo@dpg-d959hrnavr4c73a48k30-a.singapore-postgres.render.com/tutorfinder_db_as6o?"
+db_url = "postgresql://tutorflow_db_user:RyvWZRNeMGoR6jyVagibv45tagrQzngT@dpg-d9v01cjncjis73amku60-a.singapore-postgres.render.com/tutorflow_db"
 
-#if db_url and db_url.startswith("postgres://"):
-    #db_url = db_url.replace("postgres://", "postgresql://", 1)
+if db_url and db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
 
 #app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 #app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
