@@ -55,6 +55,12 @@ class Teacher(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     is_verified = db.Column(db.Boolean, default=False)
+    
+    # 👑 ADD THESE THREE COLUMNS FOR SUBSCRIPTIONS:
+    subscription_plan = db.Column(db.String(50), default='Starter')
+    subscription_status = db.Column(db.String(20), default='Active')
+    plan_expiry = db.Column(db.DateTime, nullable=True)
+
     students = db.relationship('Student', backref='teacher', lazy=True)
 
 class ParentRequest(db.Model):
@@ -466,6 +472,7 @@ def change_password():
     return render_template('change_password.html')
 
 
+
 @app.route('/teacher_dashboard')
 def teacher_dashboard():
     if 'teacher_id' not in session:
@@ -473,7 +480,7 @@ def teacher_dashboard():
     
     t_id = session['teacher_id']
     teacher = Teacher.query.get(t_id)
-    subscription_plan = session.get('subscription_plan', 'Starter')
+    subscription_plan = teacher.subscription_plan or 'Starter'
     my_students = ParentRequest.query.filter_by(teacher_id=t_id, status='Pending').all()
     print(f"DEBUG: Found {len(my_students)} requests for Teacher ID {t_id}")
 
@@ -521,7 +528,7 @@ def teacher_dashboard():
     
     monthly_attendance_pct = (total_present_query / total_sessions_query * 100) if total_sessions_query > 0 else 0
     monthly_attendance_pct = round(monthly_attendance_pct, 1)
-
+    
     return render_template('teacher_dashboard.html', 
                            teacher=teacher, 
                            students=my_students,
@@ -963,58 +970,6 @@ def delete_teacher_account():
         return redirect('/teacher_dashboard')
 
 
-# ✅ Notice broadcast check
-# @app.route('/broadcast-notice', methods=['GET', 'POST'])
-# def broadcast_notice():
-#     if 'teacher_id' not in session:
-#         return redirect('/teacher-login')
-    
-#     t_id = session['teacher_id']
-#     teacher = Teacher.query.get_or_404(t_id) # Single teacher object
-    
-#     # Active students list for dropdowns
-#     students = Student.query.filter_by(teacher_id=t_id, status='Active').all()
-    
-#     # Unique Grade Groups for Batch Selection
-#     batches = list(set([s.grade for s in students if s.grade]))
-
-#     if request.method == 'POST':
-#         title = request.form.get('title')
-#         message = request.form.get('message')
-#         target_type = request.form.get('target_type') # 'all', 'batch', 'individual'
-#         target_value = None
-
-#         if target_type == 'batch':
-#             target_value = request.form.get('selected_batch')
-#         elif target_type == 'individual':
-#             target_value = request.form.get('selected_student_id')
-
-#         new_notice = Notice(
-#             teacher_id=t_id,
-#             title=title,
-#             message=message,
-#             target_type=target_type,
-#             target_value=str(target_value) if target_value else None
-#         )
-#         db.session.add(new_notice)
-#         db.session.commit()
-        
-#         flash("📢 Notice Broadcasted Successfully!", "success")
-#         return redirect('/broadcast-notice')
-
-#     # Fetch all notices sent by THIS teacher to display in history
-#     sent_notices = Notice.query.filter_by(teacher_id=t_id).order_by(Notice.date_posted.desc()).all()
-
-#     return render_template('broadcast_notice.html', 
-#                            teacher=teacher, 
-#                            students=students, 
-#                            batches=batches, 
-#                            notices=sent_notices)
-
-
-
-
-
 
 
 @app.route('/broadcast-notice', methods=['GET', 'POST'])
@@ -1085,33 +1040,41 @@ from datetime import datetime, timedelta
 import datetime as dt
 from flask import render_template, session, redirect, url_for, flash, request
 
+
+# --- ROUTE 1: MANAGE SUBSCRIPTION PAGE ---
 @app.route('/manage-subscription')
 def manage_subscription():
     if 'teacher_id' not in session:
         flash('Please login first!', 'danger')
-        return redirect(url_for('teacher_login'))
+        return redirect('/teacher-login')
 
-    # Get subscription plan from session/database (Default: 'Starter')
-    subscription_plan = session.get('subscription_plan', 'Starter')
-    subscription_status = session.get('subscription_status', 'Active')
+    teacher = Teacher.query.get(session['teacher_id'])
+    if not teacher:
+        return redirect('/teacher-login')
 
-    # Dynamic Pricing & Renewal logic based on plan type
-    if subscription_plan == 'Starter':
+    # 👑 Auto-check Expiry: If 14 days passed, downgrade to Starter automatically
+    if teacher.plan_expiry and datetime.now() > teacher.plan_expiry:
+        teacher.subscription_plan = 'Starter'
+        teacher.subscription_status = 'Expired'
+        teacher.plan_expiry = None
+        db.session.commit()
+        flash('Your 14-Day Pro Trial has ended. Account switched to Starter Plan.', 'info')
+
+    # Pricing & Date details for template
+    if teacher.subscription_plan == 'Starter':
         billing_cycle = "₹0 / Forever Free"
         renewal_date = "N/A (Free Plan)"
     else:
         billing_cycle = "₹299 / Month"
-        default_renewal = (dt.datetime.now() + dt.timedelta(days=30)).strftime('%d %B, %Y')
-        renewal_date = session.get('renewal_date', default_renewal)
+        renewal_date = teacher.plan_expiry.strftime('%d %B, %Y') if teacher.plan_expiry else "N/A"
 
     return render_template(
         'manage_subscription.html',
-        plan=subscription_plan,
-        status=subscription_status,
+        plan=teacher.subscription_plan,
+        status=teacher.subscription_status,
         billing_cycle=billing_cycle,
         renewal_date=renewal_date
     )
-
 # --- ROUTE 2: UPGRADE / CANCEL ACTION HANDLER ---
 @app.route('/update-subscription-plan', methods=['POST'])
 def update_subscription_plan():
@@ -1141,23 +1104,37 @@ def checkout(plan_name):
     return render_template('checkout.html', plan_name=plan_name, display_title=display_title, price=price)
 
 
+
+
+
 # --- 2. PAYMENT CONFIRMATION & EMAIL SENDER ---
 @app.route('/process-subscription', methods=['POST'])
 def process_subscription():
     if 'teacher_id' not in session:
-        return redirect(url_for('teacher_login'))
+        flash('Please login first!', 'warning')
+        return redirect('/teacher-login')
 
-    user_email = session.get('email', 'user@example.com')
-    user_name = session.get('name', 'Educator')
+    t_id = session['teacher_id']
+    teacher = Teacher.query.get(t_id)
+
+    if not teacher:
+        flash('Teacher profile not found. Please log in again.', 'danger')
+        return redirect('/teacher-login')
+
+    user_email = teacher.email
+    user_name = teacher.name
     plan_choice = request.form.get('plan_choice', 'Pro Educator')
 
-    # Update Session & Subscription Status
-    session['subscription_plan'] = 'Pro Educator'
-    session['subscription_status'] = 'Active'
-    renewal_date = (dt.datetime.now() + dt.timedelta(days=14)).strftime('%d %B, %Y')
-    session['renewal_date'] = renewal_date
+    # 👑 Save 14-day expiry date directly into the database
+    expiry_datetime = datetime.now() + timedelta(days=14)
+    teacher.subscription_plan = 'Pro Educator'
+    teacher.subscription_status = 'Active'
+    teacher.plan_expiry = expiry_datetime
+    db.session.commit()
 
-    # 📧 EMAIL 1: User Ko Confirmation Mail Send Karein
+    renewal_date_str = expiry_datetime.strftime('%d %B, %Y')
+
+    # 📧 EMAIL 1: User Confirmation
     try:
         msg_user = Message(
             subject="🎉 Congratulations! Your TutorFlow Pro Trial is Active",
@@ -1171,20 +1148,18 @@ def process_subscription():
                 <p>Congratulations! Your <strong>14-Day Free Trial for Pro Educator Plan</strong> has been activated successfully.</p>
                 <div style="background: #f1f5f9; padding: 15px; border-radius: 12px; margin: 20px 0;">
                     <p style="margin: 5px 0;"><strong>Active Plan:</strong> Pro Educator Trial</p>
-                    <p style="margin: 5px 0;"><strong>Trial Valid Until:</strong> {renewal_date}</p>
+                    <p style="margin: 5px 0;"><strong>Trial Valid Until:</strong> {renewal_date_str}</p>
                     <p style="margin: 5px 0;"><strong>Amount Charged:</strong> ₹0.00 (Trial Period)</p>
                 </div>
                 <p>You can now generate unlimited PDF fee receipts, track student attendance, and send WhatsApp notifications effortlessly!</p>
                 <br>
-                <a href="https://yourdomain.com/teacher_dashboard" style="background: #a855f7; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Go to Dashboard &rarr;</a>
-                <br><br>
                 <p style="color: #64748b; font-size: 12px;">Need help? Reply to this email or contact tutorflowonline@gmail.com</p>
             </div>
         </div>
         """
         mail.send(msg_user)
 
-        # 📧 EMAIL 2: TutorFlow Admin (tutorflowonline@gmail.com) Ko Notification Mail Send Karein
+        # 📧 EMAIL 2: Admin Notification
         msg_admin = Message(
             subject=f"🔔 New Subscriber Alert: {user_name} subscribed to Pro Trial",
             recipients=['tutorflowonline@gmail.com']
@@ -1194,7 +1169,8 @@ def process_subscription():
         <p><strong>Teacher Name:</strong> {user_name}</p>
         <p><strong>Email ID:</strong> {user_email}</p>
         <p><strong>Plan Chosen:</strong> {plan_choice} (14-Day Trial)</p>
-        <p><strong>Activation Date:</strong> {dt.datetime.now().strftime('%d %B, %Y %I:%M %p')}</p>
+        <p><strong>Activation Date:</strong> {datetime.now().strftime('%d %B, %Y %I:%M %p')}</p>
+        <p><strong>Expiry Date:</strong> {renewal_date_str}</p>
         """
         mail.send(msg_admin)
 
@@ -1202,7 +1178,31 @@ def process_subscription():
         print(f"Email Error: {e}")
 
     flash('🎉 Congratulations! Your Pro Educator 14-Day Free Trial is now active!', 'success')
-    return redirect(url_for('manage_subscription'))
+    return redirect('/manage-subscription')
+  
+  
+  
+  
+  
+# 👑 GLOBAL TEMPLATE CONTEXT (Available in all HTML templates automatically)
+@app.context_processor
+def inject_user_plan():
+    if 'teacher_id' in session:
+        teacher = Teacher.query.get(session['teacher_id'])
+        if teacher:
+            # Check expiry automatically
+            if teacher.plan_expiry and datetime.now() > teacher.plan_expiry:
+                teacher.subscription_plan = 'Starter'
+                teacher.subscription_status = 'Expired'
+                teacher.plan_expiry = None
+                db.session.commit()
+            return {'plan': teacher.subscription_plan or 'Starter'}
+    return {'plan': 'Starter'}
+  
+  
+  
+  
   
 if __name__ == '__main__':
     app.run(debug=True)
+
