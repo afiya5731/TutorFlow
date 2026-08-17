@@ -112,6 +112,38 @@ class Notice(db.Model):
     target_type = db.Column(db.String(20), nullable=False) # 'all', 'batch', 'individual'
     target_value = db.Column(db.String(100), nullable=True) # e.g. "Class 10th" ya Student ID "12"
     date_posted = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+import json
+
+class StudyMaterial(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'), nullable=False)
+    title = db.Column(db.String(150), nullable=False)
+    grade = db.Column(db.String(50), nullable=False)  # e.g., "Class 10"
+    file_type = db.Column(db.String(20), nullable=False)  # 'pdf', 'image', 'doc', 'link'
+    file_url = db.Column(db.Text, nullable=False)  # Cloud link / Google Drive link / Static path
+    date_shared = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+class Quiz(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teacher.id'), nullable=False)
+    title = db.Column(db.String(150), nullable=False)
+    grade = db.Column(db.String(50), nullable=False)
+    # JSON structure storing questions, options & answer:
+    # [{"question": "...", "options": ["A", "B", "C", "D"], "answer": "A"}]
+    questions_json = db.Column(db.Text, nullable=False)
+    total_marks = db.Column(db.Integer, default=10)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+class QuizSubmission(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    score = db.Column(db.Integer, nullable=False)
+    total = db.Column(db.Integer, nullable=False)
+    submitted_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    student = db.relationship('Student', backref='submissions')
+    quiz = db.relationship('Quiz', backref='submissions')
 # ==============================================================================
 # 🔥 FORCE TABLE CREATION ON RENDER (MODELS KE BAAD RUN HONA CHAHIYE)
 # ==============================================================================
@@ -159,29 +191,37 @@ def verify_email(t_id):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        raw_phone = request.form['phone']
-        formatted_phone = f"+91{raw_phone}"
-        email = request.form.get('email').strip().lower()
+        raw_phone = request.form.get('phone', '').strip()
+        country_code = request.form.get('country_code', '+91').strip()
+        formatted_phone = f"{country_code}{raw_phone}" if not raw_phone.startswith('+') else raw_phone
+        email = request.form.get('email', '').strip().lower()
         
         existing_teacher = Teacher.query.filter_by(email=email).first()
         if existing_teacher:
             flash("⚠️ Error: This email address is already registered!", "danger")
             return redirect('/register')
-        
+        # 👑 MULTIPLE VALUES FETCH & CONVERT TO COMMA-SEPARATED STRING
+        selected_subjects = request.form.getlist('subject')
+        selected_grades = request.form.getlist('grade')
+
+        subject_str = ", ".join(selected_subjects) if selected_subjects else "All Subjects"
+        grade_str = ", ".join(selected_grades) if selected_grades else "All Grades"
+
         new_teacher = Teacher(
-            name=request.form['name'],
+            name=request.form.get('name'),
             email=email,
-            password=request.form['password'],
+            password=request.form.get('password'),
             phone=formatted_phone, 
-            area=request.form['area'],
-            subject=request.form['subject'],
-            grade=request.form['grade'],
-            tutor_type=request.form['tutor_type'],
+            area=request.form.get('area', 'Global'),
+            subject=subject_str,    # Stores: "Mathematics, Physics, Computer Science"
+            grade=grade_str,        # Stores: "High School (9-10), Higher Secondary (11-12)"
+            tutor_type=request.form.get('tutor_type'),
             is_verified=False
         )
         
         db.session.add(new_teacher)
         db.session.commit()
+        # ... Rest of verification mail dispatch logic ...
 
         #verification_link = f"https://tutorFlow-axnt.onrender.com/verify-email/{new_teacher.id}"
         # 👑 FIXED: Dynamic Host Link Matrix (Local aur Render dono par automatic chalega)
@@ -1199,10 +1239,159 @@ def inject_user_plan():
             return {'plan': teacher.subscription_plan or 'Starter'}
     return {'plan': 'Starter'}
   
+# --- TEACHER STUDY MATERIAL & QUIZ DESK ---
+
+
+
+# --- ATTEMPT QUIZ PAGE ---
+# --- TEACHER STUDY MATERIAL & QUIZ DESK ---
+@app.route('/teacher/study-material', methods=['GET', 'POST'])
+def teacher_study_material():
+    if 'teacher_id' not in session:
+        return redirect('/teacher-login')
+    
+    t_id = session['teacher_id']
+    teacher = Teacher.query.get_or_404(t_id)
+    
+    if request.method == 'POST':
+        action_type = request.form.get('action_type')
+        
+        # 1. Add Material (PDF / Doc / Image / Link)
+        if action_type == 'add_material':
+            new_mat = StudyMaterial(
+                teacher_id=t_id,
+                title=request.form.get('title'),
+                grade=request.form.get('grade'),
+                file_type=request.form.get('file_type'),
+                file_url=request.form.get('file_url')
+            )
+            db.session.add(new_mat)
+            db.session.commit()
+            flash("✨ Material shared with class successfully!", "success")
+
+        # 2. Add Quiz (Supports direct import from NotebookLM / JSON / Plain text)
+        elif action_type == 'add_quiz':
+            title = request.form.get('quiz_title')
+            grade = request.form.get('quiz_grade')
+            raw_quiz_data = request.form.get('raw_quiz_data')
+            
+            try:
+                # Validate JSON format
+                parsed = json.loads(raw_quiz_data)
+                total_marks = len(parsed)
+                new_quiz = Quiz(
+                    teacher_id=t_id,
+                    title=title,
+                    grade=grade,
+                    questions_json=json.dumps(parsed),
+                    total_marks=total_marks
+                )
+                db.session.add(new_quiz)
+                db.session.commit()
+                flash("🎯 Quiz created successfully!", "success")
+            except Exception as e:
+                flash(f"⚠️ Invalid Quiz Format. Please provide valid JSON. Error: {e}", "danger")
+
+        return redirect('/teacher/study-material')
+
+    materials = StudyMaterial.query.filter_by(teacher_id=t_id).order_by(StudyMaterial.date_shared.desc()).all()
+    quizzes = Quiz.query.filter_by(teacher_id=t_id).order_by(Quiz.created_at.desc()).all()
+    submissions = QuizSubmission.query.join(Quiz).filter(Quiz.teacher_id == t_id).order_by(QuizSubmission.submitted_at.desc()).all()
+
+    return render_template('teacher_study_material.html', 
+                           teacher=teacher, 
+                           materials=materials, 
+                           quizzes=quizzes, 
+                           submissions=submissions)
+
+
+# --- STUDENT STUDY & QUIZ PORTAL ---
+@app.route('/student/study-material')
+def student_study_material():
+    if 'student_id' not in session:
+        return redirect('/student-login')
+    
+    student = Student.query.get_or_404(session['student_id'])
+    
+    # Fetch materials and quizzes matching student's grade and teacher
+    materials = StudyMaterial.query.filter_by(teacher_id=student.teacher_id, grade=student.grade).all()
+    quizzes = Quiz.query.filter_by(teacher_id=student.teacher_id, grade=student.grade).all()
+    
+    # Map attempted quizzes with scores
+    student_submissions = {sub.quiz_id: sub for sub in QuizSubmission.query.filter_by(student_id=student.id).all()}
+
+    return render_template('student_study_material.html', 
+                           student=student, 
+                           materials=materials, 
+                           quizzes=quizzes,
+                           submissions=student_submissions)
+
+
+# --- ATTEMPT QUIZ PAGE ---
+@app.route('/student/attempt-quiz/<int:quiz_id>', methods=['GET', 'POST'])
+def attempt_quiz(quiz_id):
+    if 'student_id' not in session:
+        return redirect('/student-login')
+
+    student = Student.query.get_or_404(session['student_id'])
+    quiz = Quiz.query.get_or_404(quiz_id)
+    questions = json.loads(quiz.questions_json)
+
+    # Check if already attempted
+    existing_submission = QuizSubmission.query.filter_by(quiz_id=quiz.id, student_id=student.id).first()
+
+    if request.method == 'POST':
+        score = 0
+        total = len(questions)
+
+        for idx, q in enumerate(questions):
+            selected_option = request.form.get(f'question_{idx}')
+            if selected_option and selected_option.strip().lower() == q.get('answer', '').strip().lower():
+                score += 1
+
+        if existing_submission:
+            existing_submission.score = score
+            existing_submission.submitted_at = datetime.now(timezone.utc)
+        else:
+            submission = QuizSubmission(
+                quiz_id=quiz.id,
+                student_id=student.id,
+                score=score,
+                total=total
+            )
+            db.session.add(submission)
+        
+        db.session.commit()
+        flash(f"🎉 Test Submitted! Your Score: {score}/{total}", "success")
+        return redirect('/student/study-material')
+
+    return render_template('attempt_quiz.html', quiz=quiz, questions=questions, submission=existing_submission)
   
-  
-  
+# Delete Study Material
+@app.route('/teacher/delete-material/<int:mat_id>')
+def delete_study_material(mat_id):
+    if 'teacher_id' not in session:
+        return redirect('/teacher-login')
+    mat = StudyMaterial.query.get_or_404(mat_id)
+    if mat.teacher_id == session['teacher_id']:
+        db.session.delete(mat)
+        db.session.commit()
+        flash("Study material deleted successfully.", "info")
+    return redirect('/teacher/study-material')
+
+# Delete Quiz & Its Submissions
+@app.route('/teacher/delete-quiz/<int:quiz_id>')
+def delete_quiz(quiz_id):
+    if 'teacher_id' not in session:
+        return redirect('/teacher-login')
+    quiz = Quiz.query.get_or_404(quiz_id)
+    if quiz.teacher_id == session['teacher_id']:
+        # Delete related submissions first
+        QuizSubmission.query.filter_by(quiz_id=quiz.id).delete()
+        db.session.delete(quiz)
+        db.session.commit()
+        flash("Quiz and its submission records deleted successfully.", "info")
+    return redirect('/teacher/study-material')
   
 if __name__ == '__main__':
     app.run(debug=True)
-
