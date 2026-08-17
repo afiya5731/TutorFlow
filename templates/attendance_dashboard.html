@@ -1,0 +1,240 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Attendance Panel | TutorFlow{% endblock %}
+
+{% block extra_css %}
+    <style>
+        /* --- 1. LAYOUT RESET --- */
+        body { background-color: var(--bg-body); transition: 0.3s; }
+        .dashboard-wrapper { display: flex; min-height: 100vh; }
+        
+        /* Main content area adjustment for sidebar */
+        .main-content { 
+            flex-grow: 1; 
+            margin-left: 260px; /* Sidenav ki width */
+            padding: 2rem; 
+            width: calc(100% - 260px);
+        }
+
+        /* --- 2. STUDENT LIST (Left Side Inside Content) --- */
+        .attendance-side-panel {
+            height: calc(100vh - 4rem);
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .student-item {
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid var(--border-color) !important;
+        }
+        .student-item:hover { transform: translateX(5px); border-color: #6366f1 !important; }
+
+        /* --- 3. CALENDAR & STATS (Right Side) --- */
+        .calendar-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .cal-day { 
+            height: 60px; display: flex; align-items: center; justify-content: center; 
+            border-radius: 12px; font-weight: bold; position: relative; cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Hover Menu */
+        .hover-menu {
+            position: absolute; top: -45px; left: 50%; transform: translateX(-50%) scale(0);
+            background: white; border-radius: 20px; display: flex; gap: 5px; padding: 5px;
+            z-index: 100; transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .cal-day:hover .hover-menu { transform: translateX(-50%) scale(1); }
+        .menu-btn { width: 28px; height: 28px; border-radius: 50%; border: none; font-size: 10px; color: white; }
+
+        /* Status Colors */
+        .day-present { background: #22c55e !important; color: white !important; }
+        .day-absent { background: #ef4444 !important; color: white !important; }
+        .day-holiday { background: #1e293b !important; color: white !important; }
+
+        /* --- 4. RESPONSIVE --- */
+        @media (max-width: 992px) {
+            .main-content { margin-left: 0; width: 100%; padding: 1rem; padding-bottom: 80px; }
+            .attendance-side-panel { height: auto; position: static; margin-bottom: 2rem; }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <header class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 1px;">Attendance</span>
+            <h1 class="h2 fw-bold text-dark mb-0">Attendance Management</h1>
+        </div> 
+    </header>
+    <div class="row g-4">
+        
+        <div class="col-lg-4">
+            <div class="attendance-side-panel">
+                <div class="card stat-card p-3 mb-4">
+                    <label class="small fw-bold text-muted mb-2 text-uppercase" style="letter-spacing: 1px;">
+                        <i class="bi bi-calendar-check me-2"></i>Select Date
+                    </label>
+                    <input type="date" id="attendance-date" class="form-control rounded-pill border-0 shadow-sm px-4" value="{{ today_date }}">
+                </div>
+
+                <div class="student-list">
+                    {% for s in students %}
+                    <div class="card student-item p-3 mb-3 shadow-sm rounded-4 border-0">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div onclick="renderCalendar('{{ s.id }}', '{{ s.name }}')" style="flex-grow:1;">
+                                <h6 class="fw-bold mb-0">{{ s.name }}</h6>
+                                <small class="text-muted">Grade: {{ s.grade or 'N/A' }}</small>
+                            </div>
+                            <div class="d-flex gap-1">
+                                <button onclick="markAtt('{{ s.id }}', 'Present')" class="btn btn-sm btn-success rounded-circle p-2"><i class="bi bi-check"></i></button>
+                                <button onclick="markAtt('{{ s.id }}', 'Absent')" class="btn btn-sm btn-danger rounded-circle p-2"><i class="bi bi-x"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="calendar-container shadow-sm h-100">
+                <div id="calendar-header" class="d-none mb-4 d-flex justify-content-between align-items-center">
+                    <h3 id="current-student-name" class="fw-bold text-primary mb-0"></h3>
+                    <span class="badge bg-light text-muted rounded-pill px-3 py-2 border shadow-sm">
+                        <i class="bi bi-graph-up me-1"></i> Monthly View
+                    </span>
+                </div>
+
+                <div id="no-selection" class="empty-state text-center">
+                    <i class="bi bi-person-bounding-box" style="font-size: 5rem;"></i>
+                    <h4 class="mt-3">Tap a student's name to see their attendance calendar</h4>
+                    <p>Track progress and daily consistency here.</p>
+                </div>
+
+                <div id="history-grid"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let activeStudentId = null;
+
+    // 1. Auto-select today's date on page load if empty
+    document.addEventListener('DOMContentLoaded', () => {
+        const dateInput = document.getElementById('attendance-date');
+        if (!dateInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        updateToggleIcons(savedTheme);
+    });
+
+    // 2. Mark attendance via green tick (Present) and red cross (Absent) buttons
+    function markAtt(sId, status) {
+        const selectedDate = document.getElementById('attendance-date').value;
+        if (!selectedDate) {
+            alert("Please select a date first!");
+            return;
+        }
+
+        directMark(sId, status, selectedDate);
+    }
+
+    function renderCalendar(sId, name) {
+        activeStudentId = sId;
+        document.getElementById('no-selection').classList.add('d-none');
+        document.getElementById('calendar-header').classList.remove('d-none');
+        document.getElementById('current-student-name').innerText = name;
+
+        fetch(`/get-calendar-month/${sId}`)
+        .then(res => res.json())
+        .then(data => {
+            let html = `<h4 class="text-center fw-bold mb-4" style="color: #6366f1;">${data.month_name}</h4>`;
+            html += `<div class="cal-grid">`;
+            const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            weekdays.forEach(w => html += `<div class="text-center fw-bold text-muted small">${w}</div>`);
+
+            let p=0, a=0, h=0;
+            data.calendar.forEach(week => {
+                week.forEach(day => {
+                    if (day === 0) html += `<div class="cal-day border-0"></div>`;
+                    else {
+                        const now = new Date();
+                        const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        let status = data.attendance[dateStr] || '';
+                        let sClass = 'day-none';
+                        if(status === 'Present') { sClass = 'day-present'; p++; }
+                        else if(status === 'Absent') { sClass = 'day-absent'; a++; }
+                        else if(status === 'Holiday') { sClass = 'day-holiday'; h++; }
+
+                        html += `<div class="cal-day ${sClass}">
+                                    <div class="hover-menu shadow">
+                                        <button onclick="directMark('${sId}', 'Present', '${dateStr}')" class="menu-btn bg-success">P</button>
+                                        <button onclick="directMark('${sId}', 'Absent', '${dateStr}')" class="menu-btn bg-danger">A</button>
+                                    </div>${day}</div>`;
+                    }
+                });
+            });
+            html += `</div>`;
+            html += `
+                <div class="row g-3 mt-4">
+                    <div class="col-4 text-center text-success"><h3 class="fw-bold mb-0">${p}</h3><small>PRESENT</small></div>
+                    <div class="col-4 text-center text-danger"><h3 class="fw-bold mb-0">${a}</h3><small>ABSENT</small></div>
+                    <div class="col-4 text-center text-dark"><h3 class="fw-bold mb-0">${h}</h3><small>HOLIDAYS</small></div>
+                </div>`;
+            document.getElementById('history-grid').innerHTML = html;
+        });
+    }
+
+    function directMark(sId, status, date) {
+        fetch('/mark-student-attendance', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({student_id: sId, status: status, date: date})
+        }).then(() => {
+            const studentName = document.getElementById('current-student-name').innerText;
+            if (activeStudentId === sId || studentName) {
+                renderCalendar(sId, studentName);
+            }
+        });
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateToggleIcons(newTheme);
+    }
+
+    function updateToggleIcons(theme) {
+        const darkIcons = document.querySelectorAll('.dark-icon');
+        const lightIcons = document.querySelectorAll('.light-icon');
+        
+        if (theme === 'dark') {
+            darkIcons.forEach(el => el.classList.add('d-none'));
+            lightIcons.forEach(el => el.classList.remove('d-none'));
+        } else {
+            darkIcons.forEach(el => el.classList.remove('d-none'));
+            lightIcons.forEach(el => el.classList.add('d-none'));
+        }
+    }
+</script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}

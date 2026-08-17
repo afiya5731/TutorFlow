@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | TutorFlow Premium</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        /* --- DYNAMIC COHESIVE SYSTEM TOKENS --- */
+        :root, [data-bs-theme="light"], [data-theme="light"] {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(241, 245, 249, 1);
+            --input-bg: #ffffff;
+            --card-sub: #ffffff;
+            --shadow-glow: rgba(99, 102, 241, 0.05);
+            --accent-color: #6366f1;
+            --dropdown-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --progress-ring: #6366f1;
+        }
+
+        [data-bs-theme="dark"], [data-theme="dark"] {
+            --bg-gradient: radial-gradient(circle at top right, #1e1b4b 0%, #09090b 100%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(20, 20, 25, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(15, 15, 20, 0.6);
+            --card-sub: #141416;
+            --shadow-glow: rgba(168, 85, 247, 0.15);
+            --accent-color: #a855f7;
+            --dropdown-bg: #1e1e24;
+            --border-color: rgba(255, 255, 255, 0.12);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --progress-ring: #38bdf8;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        /* Main Premium Profile Canvas Container */
+        .glass-main-canvas {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+            position: relative;
+        }
+
+        /* Metric Array Sub Cards */
+        .glass-sub-card {
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .glass-sub-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-glass {
+            border: 1px solid var(--glass-border) !important;
+            background: var(--input-bg) !important;
+            color: var(--text-main) !important;
+            border-radius: 12px;
+            font-weight: 600;
+            padding: 10px 20px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-outline-glass:hover {
+            background: var(--text-main) !important;
+            color: var(--card-sub) !important;
+        }
+
+        .btn-glow-accent {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white !important;
+            font-weight: 700;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2);
+        }
+
+        .table-glass {
+            color: var(--text-main) !important;
+        }
+
+        .table-glass th {
+            font-weight: 700;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--glass-border);
+        }
+
+        .table-glass td {
+            border-bottom: 1px solid var(--glass-border);
+            vertical-align: middle;
+        }
+
+        .avatar-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
+        }
+
+        /* 👑 ABSOLUTE SETTINGS PANEL FRAMEWORK */
+        .settings-top-right {
+            position: absolute !important;
+            top: 25px !important;
+            right: 25px !important;
+            z-index: 1060;
+        }
+
+        .btn-settings-gear {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-main) !important;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-settings-gear:hover, .btn-settings-gear:focus {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(45deg) scale(1.05);
+        }
+
+        .dropdown-menu-glass {
+            background: var(--dropdown-bg) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            padding: 8px;
+            min-width: 185px;
+        }
+
+        .dropdown-item-glass {
+            color: var(--text-main) !important;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item-glass:hover {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+            color: white !important;
+        }
+        .dropdown-item-glass:hover {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.15)) !important;
+            color: #a855f7 !important;
+            transform: translateX(4px);
+        }
+
+        .dropdown-item-glass.text-danger:hover {
+            background: rgba(239, 68, 68, 0.12) !important;
+            color: #ef4444 !important;
+        }
+
+        .dropdown-divider-glass {
+            border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.08)) !important;
+            margin: 6px 0;
+            opacity: 1;
+        }
+
+        [data-theme="dark"] .dropdown-divider-glass,
+        [data-bs-theme="dark"] .dropdown-divider-glass {
+            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* --- 📱 EXACT REQUESTED MOBILE GLASS NAVBAR CSS --- */
+        @media (max-width: 768px) {
+            .mobile-glass-nav {
+                position: fixed; bottom: 0; left: 0; right: 0;
+                height: 70px;
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(16px) saturate(180%);
+                -webkit-backdrop-filter: blur(16px) saturate(180%);
+                display: flex; justify-content: space-around; align-items: center;
+                box-shadow: 0 -10px 30px rgba(0,0,0,0.08);
+                z-index: 9999;
+                border-top: 1px solid var(--border-color);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+
+            .mobile-nav-link {
+                text-decoration: none !important;
+                display: flex; flex-direction: column; align-items: center;
+                color: var(--text-muted) !important;
+                transition: all 0.2s ease;
+                flex: 1;
+            }
+
+            .mobile-nav-link i { font-size: 1.35rem; margin-bottom: 2px; }
+            .mobile-nav-link span { font-size: 0.65rem; font-weight: 700; }
+
+            .mobile-nav-link.active {
+                color: var(--progress-ring) !important;
+                transform: translateY(-2px);
+            }
+
+            [data-theme="dark"] .mobile-glass-nav,
+            [data-bs-theme="dark"] .mobile-glass-nav {
+                background: rgba(15, 23, 42, 0.85) !important;
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
+            }
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        .table {
+            color: var(--text-main) !important;
+        }
+
+        .table > :not(caption) > * > * {
+            background-color: transparent !important;
+            color: var(--text-main) !important;
+            border-bottom-color: var(--border-color) !important;
+        }
+
+        @media (min-width: 769px) { .mobile-glass-nav { display: none !important; } }
+    </style>
+</head>
+
+<div class="modal fade" id="securityKeyModal" tabindex="-1" aria-hidden="true" style="z-index: 1070;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content dropdown-menu-glass p-3 text-start" style="border: 1px solid var(--border-color) !important;">
+            <div class="modal-header border-0">
+                <h5 class="fw-bold m-0 text-main"><i class="bi bi-shield-lock-fill text-warning me-2"></i>Credential Update Suite</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/change-password" method="POST">
+                <div class="modal-body d-flex flex-column gap-3">
+                    <div>
+                        <label class="small fw-bold mb-2 text-main">Current Password Node *</label>
+                        <div class="input-group-glass">
+                            <i class="bi bi-lock-fill"></i>
+                            <input type="password" name="current_password" class="form-control glass-control" placeholder="••••••••" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="small fw-bold mb-2 text-main">New Secret Key Matrix *</label>
+                        <div class="input-group-glass">
+                            <i class="bi bi-key-fill"></i>
+                            <input type="password" name="new_password" class="form-control glass-control" minlength="6" placeholder="Min. 6 alphanumeric tokens" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="submit" class="btn-glow-accent w-100 py-3 small">Deploy New Security Token &rarr;</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<body>
+
+    <div class="container py-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-11 col-lg-9">
+                
+                <div class="glass-main-canvas shadow-sm">
+                    
+                    <div class="settings-top-right dropdown">
+                        <button class="btn btn-settings-gear" type="button" id="settingsMenuButton" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Settings Menu">
+                            <i class="bi bi-gear-fill"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-glass shadow-lg" aria-labelledby="settingsMenuButton">
+                            <li>
+                                <a class="dropdown-item py-2 fw-semibold rounded-3" href="/student-dashboard">
+                                    <i class="bi bi-house-door me-2 text-primary"></i> Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item dropdown-item-glass" href="/student-profile">
+                                    <i class="bi bi-person-bounding-box text-warning"></i> View Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item dropdown-item-glass" href="/edit-profile">
+                                    <i class="bi bi-pencil-square text-primary"></i> Edit Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item dropdown-item-glass" href="#" id="theme-toggle-dropdown">
+                                    <i class="bi bi-palette-fill text-info"></i> Change Theme
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item dropdown-item-glass" href="/contact">
+                                    <i class="bi bi-headset text-success"></i> Help & Support
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider" style="opacity: 0.1; border-color: var(--glass-border);"></li>
+                            <li>
+                                <a class="dropdown-item dropdown-item-glass text-danger" href="/logout" onclick="return confirm('Logout?')">
+                                    <i class="bi bi-box-arrow-right"></i> Sign Out
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="row align-items-center text-center text-md-start mb-5 g-4 pe-md-5">
+                        <div class="col-12 col-md-auto d-flex justify-content-center">
+                            <div class="avatar-circle">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-auto flex-grow-1">
+                            <span class="badge bg-primary-subtle text-primary mb-2 px-3 py-2 rounded-pill fw-bold">Student Active Member</span>
+                            <h2 class="fw-bold m-0" style="letter-spacing: -0.02em;">{{ student.name }}</h2>
+                        </div>
+                    </div>
+
+                    <div class="d-none d-md-flex flex-wrap gap-3 mb-5 justify-content-center justify-content-md-start">
+                        <a href="/edit-profile" class="btn btn-outline-glass btn-sm px-4 py-2">
+                            <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                        </a>
+                        <a href="/" class="btn btn-glow-accent btn-sm px-4 py-2">
+                            <i class="bi bi-search me-2"></i>Find Instructors &rarr;
+                        </a>
+                    </div>
+
+                    <div class="row g-4 mb-5 text-start">
+                        <div class="col-12">
+                            <h4 class="fw-bold mb-3" style="letter-spacing: -0.01em; color: var(--accent-color);"><i class="bi bi-grid-fill me-2"></i>Personal Metadata</h4>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="p-3 rounded-3" style="background: var(--input-bg); border: 1px solid var(--glass-border);">
+                                        <small class="text-muted d-block">Registered Mail</small>
+                                        <span class="fw-semibold text-main">{{ student.email }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 rounded-3" style="background: var(--input-bg); border: 1px solid var(--glass-border);">
+                                        <small class="text-muted d-block">WhatsApp Contact Node</small>
+                                        <span class="fw-semibold text-main">+91 {{ student.phone }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 rounded-3" style="background: var(--input-bg); border: 1px solid var(--glass-border);">
+                                        <small class="text-muted d-block">Current Academic Class</small>
+                                        <span class="fw-semibold text-main">{{ student.grade }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="p-3 rounded-3" style="background: var(--input-bg); border: 1px solid var(--glass-border);">
+                                        <small class="text-muted d-block">Bhopal Regional Sector Area</small>
+                                        <span class="fw-semibold text-main">{{ student.area }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 text-start">
+                        <div class="col-12 col-md-6">
+                            <div class="glass-sub-card h-100 shadow-sm">
+                                <h5 class="fw-bold text-main mb-3"><i class="bi bi-calendar-check-fill text-primary me-2"></i>Attendance Logs</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-glass m-0 small">
+                                        <thead>
+                                            <tr><th>Log Date</th><th>Status Mapping</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for record in attendance %}
+                                            <tr>
+                                                <td>{{ record.date }}</td>
+                                                <td>
+                                                    <span class="badge {% if record.status == 'Present' %}bg-success-subtle text-success border border-success-subtle{% else %}bg-danger-subtle text-danger border border-danger-subtle{% endif %} rounded-pill px-2">
+                                                        {{ record.status }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="glass-sub-card h-100 shadow-sm">
+                                <h5 class="fw-bold text-main mb-3"><i class="bi bi-currency-rupee text-success me-2"></i>Fee Statement Ledger</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-glass m-0 small">
+                                        <thead>
+                                            <tr><th>Statement Month</th><th>Amount</th><th>Status Tag</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for fee in fees %}
+                                            <tr>
+                                                <td>{{ fee.month }}</td>
+                                                <td class="fw-semibold">₹{{ student.monthly_fee | default(0, true) }}</td>
+                                                <td>
+                                                    <span class="badge {% if fee.status == 'Paid' %}bg-success-subtle text-success border border-success-subtle{% else %}bg-warning-subtle text-warning border border-warning-subtle{% endif %} rounded-pill px-2">
+                                                        {{ fee.status }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- 📱 MOBILE GLASS NAVIGATION BAR -->
+    <nav class="mobile-glass-nav">
+        <a href="/student-dashboard" class="mobile-nav-link">
+            <i class="bi bi-house-door-fill"></i>
+            <span>Home</span>
+        </a>
+        <a href="/student/study-material" class="mobile-nav-link">
+            <i class="bi bi-mortarboard-fill"></i>
+            <span>Study</span>
+        </a>
+        <a href="/student-profile" class="mobile-nav-link active">
+            <i class="bi bi-person-circle"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const themeToggleDropdown = document.getElementById('theme-toggle-dropdown');
+        const htmlElement = document.documentElement;
+
+        // Sync local preference storage matrices
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        htmlElement.setAttribute('data-bs-theme', savedTheme);
+        htmlElement.setAttribute('data-theme', savedTheme);
+
+        themeToggleDropdown.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            let theme = htmlElement.getAttribute('data-theme') || htmlElement.getAttribute('data-bs-theme');
+            let newTheme = (theme === 'light') ? 'dark' : 'light';
+            
+            // Apply both attributes for double security architecture
+            htmlElement.setAttribute('data-bs-theme', newTheme);
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>

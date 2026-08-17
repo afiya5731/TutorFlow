@@ -1,0 +1,349 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Notice Desk | TutorFlow{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --- GLASS CARD CONTAINER --- */
+    .notice-card {
+        background: var(--card-bg) !important;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--border-color) !important;
+        border-radius: 28px !important;
+        padding: 30px !important;
+        box-shadow: var(--glass-shadow);
+    }
+
+    .form-label-custom {
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.8px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-left: 4px;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    /* --- ANIMATED BORDER INPUT GROUPS --- */
+    .animated-input-group {
+        position: relative;
+        border-radius: 16px;
+        padding: 2px;
+        background: var(--border-color);
+        transition: all 0.4s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .animated-input-inner {
+        width: 100%;
+        background: var(--card-bg);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+    }
+
+    .animated-input-group:focus-within {
+        background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899, #6366f1);
+        background-size: 300% 100%;
+        animation: borderGradientSweep 2.5s linear infinite;
+        box-shadow: 0 8px 20px rgba(168, 85, 247, 0.25);
+    }
+
+    @keyframes borderGradientSweep {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .glass-input-field {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 12px 10px !important;
+        font-weight: 600;
+        color: var(--text-main) !important;
+    }
+
+    .glass-input-field::placeholder {
+        color: var(--text-muted) !important;
+        opacity: 0.6;
+    }
+
+    /* --- SELECT DROPDOWN DARK MODE SAFE --- */
+    .glass-select-custom {
+        background-color: var(--card-bg) !important;
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 14px !important;
+        padding: 12px 14px !important;
+        font-weight: 600;
+    }
+
+    .glass-select-custom option {
+        background-color: var(--header-bg) !important;
+        color: var(--text-main) !important;
+    }
+
+    /* --- AUDIENCE TOGGLE BUTTONS --- */
+    .target-toggle-btn {
+        background: rgba(125, 125, 125, 0.08);
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 10px 14px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-check:checked + .target-toggle-btn {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+        color: #ffffff !important;
+        border-color: transparent !important;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+    }
+
+    /* --- MULTI-STUDENT SELECTION BOX --- */
+    .multi-student-box {
+        max-height: 200px;
+        overflow-y: auto;
+        background: rgba(125, 125, 125, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 12px;
+    }
+
+    .student-checkbox-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        border-radius: 10px;
+        transition: background 0.2s ease;
+        cursor: pointer;
+    }
+
+    .student-checkbox-item:hover {
+        background: rgba(168, 85, 247, 0.1);
+    }
+
+    .student-checkbox-item label {
+        color: var(--text-main);
+        font-weight: 600;
+        font-size: 0.88rem;
+        cursor: pointer;
+        margin-bottom: 0;
+    }
+
+    /* --- ANNOUNCEMENT CARD ITEMS --- */
+    .announcement-item {
+        background: rgba(125, 125, 125, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 18px;
+        transition: all 0.3s ease;
+    }
+
+    .announcement-item:hover {
+        transform: translateY(-3px);
+        background: rgba(125, 125, 125, 0.08);
+    }
+
+    .announcement-title {
+        color: var(--text-main) !important;
+        font-weight: 700;
+    }
+
+    .announcement-body {
+        color: var(--text-muted) !important;
+    }
+
+    .btn-publish-glow {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        color: white !important;
+        font-weight: 800;
+        border: none;
+        padding: 12px;
+        border-radius: 16px;
+        box-shadow: 0 8px 22px rgba(99, 102, 241, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-publish-glow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(99, 102, 241, 0.45);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid my-2">
+                        <header class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 1px;">Notices</span>
+                <h1 class="h2 fw-bold text-dark mb-0">Broadcast Announcement</h1>
+            </div> 
+        </header>
+    <div class="row g-4">
+        
+        <!-- BROADCAST FORM -->
+        <div class="col-lg-5">
+            <div class="card notice-card">
+                <h4 class="fw-bold mb-2 text-main d-flex align-items-center">
+                    <i class="bi bi-megaphone-fill text-purple me-2 fs-3"></i>Broadcast Notice
+                </h4>
+                <p class="text-muted small mb-4">Send instant notifications to all students, a specific class, or multiple selected students.</p>
+
+                <form action="/broadcast-notice" method="POST">
+                    <!-- Notice Title -->
+                    <div class="mb-3">
+                        <label class="form-label-custom">Notice Title</label>
+                        <div class="animated-input-group">
+                            <div class="animated-input-inner">
+                                
+                                <input type="text" name="title" class="form-control glass-input-field" placeholder="e.g. Sunday Extra Class Timings" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TARGET AUDIENCE TOGGLE -->
+                    <div class="mb-3">
+                        <label class="form-label-custom">Target Audience</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="target_type" id="targetAll" value="all" checked onclick="toggleTargetDropdowns()">
+                            <label class="btn target-toggle-btn rounded-start-pill" for="targetAll">All Students</label>
+
+                            <input type="radio" class="btn-check" name="target_type" id="targetBatch" value="batch" onclick="toggleTargetDropdowns()">
+                            <label class="btn target-toggle-btn" for="targetBatch">By Class</label>
+
+                            <input type="radio" class="btn-check" name="target_type" id="targetIndividual" value="individual" onclick="toggleTargetDropdowns()">
+                            <label class="btn target-toggle-btn rounded-end-pill" for="targetIndividual">Select Students</label>
+                        </div>
+                    </div>
+
+                    <!-- CLASS SELECTOR (Hidden by default) -->
+                    <div class="mb-3" id="batchSelectBox" style="display: none;">
+                        <label class="form-label-custom">Select Target Class</label>
+                        <select name="selected_batch" class="form-select glass-select-custom">
+                            <option value="" disabled selected>Choose Class</option>
+                            <option value="Class 1st">Class 1st</option>
+                            <option value="Class 2nd">Class 2nd</option>
+                            <option value="Class 3rd">Class 3rd</option>
+                            <option value="Class 4th">Class 4th</option>
+                            <option value="Class 5th">Class 5th</option>
+                            <option value="Class 6th">Class 6th</option>
+                            <option value="Class 7th">Class 7th</option>
+                            <option value="Class 8th">Class 8th</option>
+                            <option value="Class 9th">Class 9th</option>
+                            <option value="Class 10th">Class 10th</option>
+                            <option value="Class 11th">Class 11th</option>
+                            <option value="Class 12th">Class 12th</option>
+                            {% for b in batches %}
+                                {% if b not in ['Class 1st','Class 2nd','Class 3rd','Class 4th','Class 5th','Class 6th','Class 7th','Class 8th','Class 9th','Class 10th','Class 11th','Class 12th'] %}
+                                    <option value="{{ b }}">{{ b }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- MULTIPLE INDIVIDUAL STUDENTS SELECTOR (Hidden by default) -->
+                    <div class="mb-3" id="studentSelectBox" style="display: none;">
+                        <label class="form-label-custom">Select Student(s)</label>
+                        <div class="multi-student-box">
+                            {% if students %}
+                                {% for s in students %}
+                                <div class="student-checkbox-item">
+                                    <label for="std_{{ s.id }}">
+                                        {{ s.name }} <span class="badge bg-purple-subtle text-purple ms-1" style="font-size:0.65rem;">{{ s.grade or 'Class Unassigned' }}</span>
+                                    </label>
+                                    <input type="checkbox" name="selected_student_ids" id="std_{{ s.id }}" value="{{ s.id }}" class="form-check-input">
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted small m-0 text-center py-2">No active students available.</p>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted" style="font-size:0.7rem;">Check one or multiple students to target directly.</small>
+                    </div>
+
+                    <!-- Notice Message -->
+                    <div class="mb-4">
+                        <label class="form-label-custom">Notice Content</label>
+                        <div class="animated-input-group">
+                            <div class="animated-input-inner align-items-start py-2">
+                                <i class="bi bi-chat-left-text me-2 mt-1" style="color:#a855f7;"></i>
+                                <textarea name="message" class="form-control glass-input-field" rows="4" placeholder="Write notice content or guidelines here..." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-publish-glow w-100">
+                        <i class="bi bi-send-fill me-2"></i>Publish Notice
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- SENT NOTICES FEED -->
+        <div class="col-lg-7">
+            <div class="card notice-card">
+                <h4 class="fw-bold mb-3 text-main d-flex align-items-center">
+                    <i class="bi bi-journal-text text-primary me-2 fs-3"></i>Broadcast History
+                </h4>
+                
+                {% if notices %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for n in notices %}
+                        <div class="announcement-item">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div>
+                                    <h5 class="announcement-title fs-6 mb-1">{{ n.title }}</h5>
+                                    <span class="badge bg-purple-subtle text-purple border border-purple-subtle rounded-pill small">
+                                        {% if n.target_type == 'all' %}
+                                            🌐 All Students
+                                        {% elif n.target_type == 'batch' %}
+                                            📚 Class: {{ n.target_value }}
+                                        {% else %}
+                                            👤 Individual Targeted
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <a href="/delete-notice/{{ n.id }}" class="btn btn-sm btn-outline-danger border-0 rounded-circle p-2" onclick="return confirm('Delete this notice?')" title="Delete Notice">
+                                    <i class="bi bi-trash-fill fs-6"></i>
+                                </a>
+                            </div>
+                            <p class="announcement-body small mt-2 mb-2 lh-base">{{ n.message }}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top border-secondary border-opacity-10">
+                                <small class="text-muted" style="font-size: 0.72rem;">
+                                    <i class="bi bi-clock me-1"></i>{{ n.date_posted.strftime('%d %b %Y, %I:%M %p') }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-megaphone text-muted fs-1 mb-2 d-block opacity-50"></i>
+                        <h6 class="fw-bold text-muted">No Announcements Published</h6>
+                        <p class="text-muted small">Broadcast notices will appear here once published.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function toggleTargetDropdowns() {
+        const isBatch = document.getElementById('targetBatch').checked;
+        const isIndividual = document.getElementById('targetIndividual').checked;
+
+        document.getElementById('batchSelectBox').style.display = isBatch ? 'block' : 'none';
+        document.getElementById('studentSelectBox').style.display = isIndividual ? 'block' : 'none';
+    }
+</script>
+{% endblock %}

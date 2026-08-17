@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Registration | TutorFlow Premium{% endblock %}
+
+{% block extra_css %}
+    <style>
+        :root[data-bs-theme="light"] {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(241, 245, 249, 1);
+            --input-bg: #ffffff;
+            --card-sub: #ffffff;
+            --shadow-glow: rgba(99, 102, 241, 0.05);
+            --link-color: #6366f1;
+            --alert-bg: #f0fdf4;
+            --alert-border: #bbf7d0;
+            --alert-text: #166534;
+        }
+
+        :root[data-bs-theme="dark"] {
+            --bg-gradient: radial-gradient(circle at top right, #1e1b4b 0%, #09090b 100%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(20, 20, 25, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(15, 15, 20, 0.6);
+            --card-sub: #141416;
+            --shadow-glow: rgba(168, 85, 247, 0.15);
+            --link-color: #a855f7;
+            --alert-bg: rgba(22, 101, 52, 0.2);
+            --alert-border: rgba(34, 197, 94, 0.2);
+            --alert-text: #4ade80;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Unified Premium Navbar */
+        .glass-nav {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 15px 0;
+        }
+
+        .text-main {
+            color: var(--text-main) !important;
+        }
+
+        .theme-toggle-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 100px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-nav-accent {
+            border: 1px solid #06b6d4 !important;
+            background: rgba(6, 182, 212, 0.05) !important;
+            color: #06b6d4 !important;
+            font-weight: 600;
+            border-radius: 10px;
+        }
+
+        .modal-content-glass {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 16px !important;
+        }
+
+        /* Glassmorphic Board Structure */
+        .glass-reg-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .glass-reg-card:hover {
+            box-shadow: 0 25px 50px var(--shadow-glow);
+        }
+
+        .input-glass {
+            background: var(--input-bg) !important;
+            border: 1px solid var(--glass-border) !important;
+            color: var(--text-main) !important;
+            padding: 12px 14px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .input-glass:focus {
+            border-color: var(--link-color);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+        }
+
+        .select-glass {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a855f7' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 12px;
+        }
+
+        .input-group-text-glass {
+            background: var(--glass-border);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            border-radius: 12px 0 0 12px;
+            font-weight: 600;
+            padding: 0 16px;
+        }
+
+        /* Custom Adaptive Radio Framework */
+        .category-box {
+            background: var(--input-bg);
+            border: 1px solid var(--glass-border);
+            padding: 12px 16px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--link-color);
+            border-color: var(--link-color);
+        }
+
+        .btn-glow-register {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white !important;
+            font-weight: 700;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .btn-glow-register:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+        }
+
+        .brand-accent {
+            color: var(--link-color);
+            font-weight: 700;
+        }
+
+        /* Fixed Flush Flash Alerts */
+        .alert-custom-glass {
+            background: var(--alert-bg) !important;
+            border: 1px solid var(--alert-border) !important;
+            color: var(--alert-text) !important;
+            backdrop-filter: blur(10px);
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .icon-header-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7, #f43f5e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: white;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.25);
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+    <div class="container my-5 flex-grow-1 d-flex flex-column justify-content-center"> 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="row justify-content-center px-2 mb-3">
+                    <div class="col-11 col-md-8 col-lg-7 col-xl-6">
+                        {% for category, message in messages %}
+                            <div class="alert alert-custom-glass alert-dismissible fade show shadow-sm" role="alert">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-info-circle-fill"></i>
+                                    <strong>{{ message }}</strong>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="row justify-content-center px-2">
+            <div class="col-11 col-md-8 col-lg-7 col-xl-6">
+                
+                <div class="glass-reg-card shadow-sm">
+                    <div class="icon-header-circle">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </div>
+                    
+                    <h3 class="fw-bold text-center mb-1" style="letter-spacing:-0.02em;">Join as a Tutor</h3>
+                    
+                    <form action="/register" method="POST" autocomplete="off">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="small fw-bold mb-2 text-main">Full Name </label>
+                                <input type="text" name="name" class="form-control input-glass" placeholder="Enter your full name" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="small fw-bold mb-2 text-main">Email </label>
+                                <input type="email" name="email" class="form-control input-glass" placeholder="name@domain.com" required>
+                            </div>
+                            
+<!-- GLOBAL PHONE NUMBER WITH COUNTRY DIAL CODE -->
+<div class="col-md-6">
+    <label class="small fw-bold mb-2 text-main">Phone Number</label>
+    <div class="input-group">
+        <select name="country_code" class="input-group-text input-group-text-glass" style="max-width: 110px;">
+            <option value="+91" selected>🇮🇳 +91</option>
+            <option value="+1">🇺🇸 +1</option>
+            <option value="+44">🇬🇧 +44</option>
+            <option value="+971">🇦🇪 +971</option>
+            <option value="+966">🇸🇦 +966</option>
+            <option value="+61">🇦🇺 +61</option>
+            <option value="+1">🇨🇦 +1</option>
+            <option value="+65">🇸🇬 +65</option>
+            <option value="+49">🇩🇪 +49</option>
+            <option value="+33">🇫🇷 +33</option>
+        </select>
+        <input type="tel" name="phone" class="form-control input-glass" style="border-radius: 0 12px 12px 0 !important;" placeholder="Phone / WhatsApp number" required>
+    </div>
+</div>
+
+<!-- GLOBAL LOCATION / CITY INPUT -->
+<div class="col-md-6">
+    <label class="small fw-bold mb-2 text-main">Location / City & Country</label>
+    <input type="text" name="area" class="form-control input-glass" placeholder="e.g. London, Dubai, New York, Delhi, etc." required>
+</div>
+                            
+
+
+ <!-- MULTIPLE SUBJECTS SELECTION -->
+<div class="col-12">
+    <label class="small fw-bold mb-2 text-main">Choose Subjects (Select Multiple)</label>
+    <div class="d-flex flex-wrap gap-2">
+        {% for sub in ["Mathematics", "Physics", "Chemistry", "Biology", "Science", "English", "Hindi", "Social Science", "Commerce", "Computer Science", "Coding / AI"] %}
+        <label class="category-box d-flex align-items-center gap-2 py-2 px-3" style="cursor: pointer;">
+            <input class="form-check-input mt-0" type="checkbox" name="subject" value="{{ sub }}">
+            <span class="small fw-semibold text-main">{{ sub }}</span>
+        </label>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- MULTIPLE GRADES SELECTION -->
+<div class="col-12">
+    <label class="small fw-bold mb-2 text-main">Teaching Grades / Levels (Select Multiple)</label>
+    <div class="d-flex flex-wrap gap-2">
+        {% for grd in ["Primary (1-5)", "Middle (6-8)", "High School (9-10)", "Higher Secondary (11-12)", "College / University", "Competitive Exams (JEE/NEET/GATE)"] %}
+        <label class="category-box d-flex align-items-center gap-2 py-2 px-3" style="cursor: pointer;">
+            <input class="form-check-input mt-0" type="checkbox" name="grade" value="{{ grd }}">
+            <span class="small fw-semibold text-main">{{ grd }}</span>
+        </label>
+        {% endfor %}
+    </div>
+</div>
+                            
+<div class="col-md-6">
+    <label class="small fw-bold mb-2 text-main">Tutoring Mode</label>
+    <div class="d-flex gap-2 h-100 align-items-center">
+        <div class="form-check flex-grow-1 category-box d-flex align-items-center gap-1">
+            <input class="form-check-input ms-0" type="radio" name="tutor_type" id="online" value="Online / Remote" checked>
+            <label class="form-check-label small fw-semibold text-muted ms-1" for="online">Online / Global</label>
+        </div>
+        <div class="form-check flex-grow-1 category-box d-flex align-items-center gap-1">
+            <input class="form-check-input ms-0" type="radio" name="tutor_type" id="home" value="Home Tutor">
+            <label class="form-check-label small fw-semibold text-muted ms-1" for="home">In-Person</label>
+        </div>
+        <div class="form-check flex-grow-1 category-box d-flex align-items-center gap-1">
+            <input class="form-check-input ms-0" type="radio" name="tutor_type" id="coaching" value="Institute / Academy">
+            <label class="form-check-label small fw-semibold text-muted ms-1" for="coaching">Academy</label>
+        </div>
+    </div>
+</div>
+                            
+                            <div class="col-12">
+                                <label class="small fw-bold mb-2 text-main">Create Password </label>
+                                <input type="password" name="password" class="form-control input-glass" minlength="6" placeholder="Create password" autocomplete="new-password" value="" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-glow-register w-100 mt-4 py-3">
+                            Verify Mail &rarr;
+                        </button>
+                    </form>
+                    
+                    <div class="text-center mt-4 text-muted small">
+                        Already have an account? <a href="/teacher-login" class="brand-accent text-decoration-none ms-1">Login here</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+    // Area Dropdown Engine
+    function toggleOtherArea() {
+        const areaSelect = document.getElementById('areaSelect');
+        const customAreaWrapper = document.getElementById('customAreaWrapper');
+        const customAreaInput = document.getElementById('customAreaInput');
+
+        if (areaSelect.value === 'Other Area') {
+            customAreaWrapper.style.display = 'block';
+            customAreaInput.required = true;
+            // Name attribute shifting taaki user ka typed data submit ho
+            areaSelect.removeAttribute('name');
+            customAreaInput.setAttribute('name', 'area');
+        } else {
+            customAreaWrapper.style.display = 'none';
+            customAreaInput.required = false;
+            // Name attribute reset to select element
+            areaSelect.setAttribute('name', 'area');
+            customAreaInput.removeAttribute('name');
+        }
+    }
+
+    // Subject Dropdown Engine
+    function toggleOtherSubject() {
+        const subjectSelect = document.getElementById('subjectSelect');
+        const customSubjectWrapper = document.getElementById('customSubjectWrapper');
+        const customSubjectInput = document.getElementById('customSubjectInput');
+
+        if (subjectSelect.value === 'Other Subject') {
+            customSubjectWrapper.style.display = 'block';
+            customSubjectInput.required = true;
+            // Name attribute shifting taaki user ka typed data submit ho
+            subjectSelect.removeAttribute('name');
+            customSubjectInput.setAttribute('name', 'subject');
+        } else {
+            customSubjectWrapper.style.display = 'none';
+            customSubjectInput.required = false;
+            // Name attribute reset to select element
+            subjectSelect.setAttribute('name', 'subject');
+            customSubjectInput.removeAttribute('name');
+        }
+    }
+</script>
+{% endblock %}
