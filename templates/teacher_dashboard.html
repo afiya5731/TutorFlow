@@ -1,0 +1,611 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Teacher Dashboard | TutorFlow{% endblock %}
+
+{% block extra_css %}
+    <style>
+        /* --- CORE THEME SYSTEM --- */
+        :root {
+            --bg-body: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(226, 232, 240, 0.8);
+            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            --header-bg: #ffffff;
+            --table-hover: #f1f5f9;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #090d16;
+            --card-bg: rgba(20, 27, 44, 0.75);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            --header-bg: #111827;
+            --table-hover: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+        }
+
+
+        /* --- MAIN CONTENT LAYOUT --- */
+
+
+        /* --- GLASS CARDS & DARK MODE VISIBILITY FIXES --- */
+        .glass-card, .card, .stat-card {
+            background: var(--card-bg) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color) !important;
+            border-radius: 24px !important;
+            box-shadow: var(--glass-shadow);
+            color: var(--text-main) !important;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover, .stat-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .text-dark, h1, h2, h3, h4, h5, h6 {
+            color: var(--text-main) !important;
+        }
+
+        .text-muted {
+            color: var(--text-muted) !important;
+        }
+
+        /* --- HEADER & SETTINGS DROPDOWN (MOBILE OVERLAP FIX) --- */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+            gap: 15px;
+        }
+
+        .mobile-brand-wrapper {
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .btn-settings-hub {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .btn-settings-hub:hover {
+            transform: rotate(45deg);
+            color: #6366f1;
+            border-color: #6366f1;
+        }
+
+        .dropdown-hub-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            background: var(--header-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            min-width: 250px;
+            list-style: none;
+            z-index: 10000 !important;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            padding: 8px;
+        }
+
+        .dropdown-hub-item {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 10px 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            transition: all 0.2s ease;
+            background: transparent;
+            border: none;
+        }
+
+        .dropdown-hub-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1 !important;
+        }
+
+        .status-indicator {
+            width: 8px; height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #22c55e;
+        }
+
+        /* --- HUB TILES --- */
+        .hub-premium-bar {
+            background: var(--card-bg);
+            border-radius: 28px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--glass-shadow);
+        }
+
+        .action-tile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 10px;
+            border-radius: 20px;
+            height: 95px;
+            transition: all 0.3s ease;
+            background: rgba(125, 125, 125, 0.04);
+            border: 1px solid var(--border-color);
+        }
+
+        .action-tile:hover {
+            transform: translateY(-3px);
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .profile-avatar-md {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            color: white;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; position: relative;
+        }
+
+        .edit-badge-sm {
+            position: absolute; bottom: -4px; right: -4px;
+            width: 18px; height: 18px;
+            background: var(--header-bg); color: #6366f1;
+            border-radius: 50%; font-size: 9px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1.5px solid #6366f1;
+        }
+
+        .tile-label { 
+            font-size: 0.68rem; font-weight: 800; letter-spacing: 0.5px; margin-top: 6px;
+            color: var(--text-muted);
+        }
+
+        .tile-blue i { color: #6366f1; font-size: 1.4rem; }
+        .tile-purple i { color: #a855f7; font-size: 1.4rem; }
+        .tile-green i { color: #22c55e; font-size: 1.4rem; }
+        .hub-link { text-decoration: none; display: block; }
+
+        /* --- TABLES & RESPONSIVENESS FIXES --- */
+        .table {
+            color: var(--text-main) !important;
+        }
+
+        .table > :not(caption) > * > * {
+            background-color: transparent !important;
+            color: var(--text-main) !important;
+            border-bottom-color: var(--border-color) !important;
+        }
+
+        .student-row:hover {
+            background-color: var(--table-hover) !important;
+        }
+
+        .btn-action-circle {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            transition: 0.2s;
+        }
+
+        .btn-action-circle:hover {
+            transform: scale(1.1);
+            border-color: #6366f1;
+        }
+
+        /* --- MOBILE OVERLAP PREVENTER (BREAKPOINT MEDIA QUERIES) --- */
+        @media (max-width: 768px) {
+            .sidebar { display: none !important; }
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+                padding: 1.2rem !important;
+                padding-bottom: 110px !important;
+            }
+
+            .dashboard-header {
+                flex-direction: row !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                margin-bottom: 1.5rem !important;
+            }
+
+            .mobile-brand-wrapper {
+                display: flex !important;
+            }
+
+            .welcome-title-box h1 {
+                font-size: 1.35rem !important;
+            }
+
+            .action-tile { height: 85px; }
+        }
+                /* Status Badge Contrast Fix */
+        .badge.bg-warning, .bg-warning-subtle {
+            background-color: #fef3c7 !important;
+            color: #b45309 !important; /* Dark amber text for clear reading */
+            font-weight: 700 !important;
+            border: 1px solid #fde68a !important;
+        }
+
+        [data-theme="dark"] .badge.bg-warning {
+            background-color: rgba(245, 158, 11, 0.2) !important;
+            color: #fbbf24 !important;
+            border: 1px solid rgba(245, 158, 11, 0.4) !important;
+        }
+
+
+/* Light Theme Variables */
+:root {
+    --bg-body: #f8fafc;
+    --sidebar-bg: #ffffff; /* Light mode me White Sidebar */
+    --sidebar-text: #475569;
+    --sidebar-active-bg: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-color: rgba(226, 232, 240, 0.8);
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+    --bg-body: #090d16;
+    --sidebar-bg: #0f172a; /* Dark mode me Navy Sidebar */
+    --sidebar-text: #94a3b8;
+    --sidebar-active-bg: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    --card-bg: rgba(20, 27, 44, 0.75);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border-color: rgba(255, 255, 255, 0.08);
+}
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<header class="dashboard-header mb-4 align-items-center">
+    <div class="welcome-title-box">
+        <div class="mobile-brand-wrapper mb-2">
+            <img src="{{ url_for('static', filename='favicon.png') }}" alt="Logo" style="width:26px; height:26px;">
+            <span class="fw-bold fs-6">Tutor<span style="color: #a855f7;">Flow</span></span>
+        </div>
+        <span class="text-muted small fw-bold text-uppercase align-items-center" style="letter-spacing: 1px;">Overview Workspace</span>
+        <h6 class="h3 fw-bold mb-0 fw-bold">Welcome, {{ teacher.name }}</h6>
+    </div>
+
+    <!-- SETTINGS BUTTON HUB -->
+    <div class="custom-dropdown">
+        <button class="btn btn-settings-hub shadow-sm" type="button" onclick="toggleDropdownMenu(event)">
+            <i class="bi bi-gear-fill fs-5"></i>
+        </button>
+        
+        <ul id="settingsMenu" class="dropdown-hub-menu shadow-lg d-none">
+            <li class="px-3 py-2 border-bottom border-secondary border-opacity-10">
+                <div class="d-flex align-items-center">
+                    <div class="status-indicator me-2"></div>
+                    <span class="small fw-bold text-muted text-uppercase" style="font-size:0.65rem;">Verified Instructor</span>
+                </div>
+            </li>
+            
+            <li>
+                <a class="dropdown-hub-item mt-1" href="/edit-teacher-profile">
+                    <i class="bi bi-person-gear me-3 text-primary fs-6"></i>Edit Profile
+                </a>
+            </li>
+            
+            <li>
+                <a class="dropdown-hub-item" href="/" target="_blank">
+                    <i class="bi bi-globe me-3 text-success fs-6"></i>View Public Site
+                </a>
+            </li>
+            
+            <li>
+                <button class="dropdown-hub-item d-flex justify-content-between align-items-center w-100" onclick="toggleTheme(); event.stopPropagation();">
+                    <div>
+                        <i class="bi bi-moon-stars-fill me-3 text-warning dark-icon"></i>
+                        <i class="bi bi-brightness-high-fill me-3 text-warning light-icon d-none"></i>
+                        <span>Appearance</span>
+                    </div>
+                    <span class="badge bg-purple-subtle text-purple rounded-pill small" style="font-size:0.65rem;">Toggle</span>
+                </button>
+            </li>
+            
+            <li>
+                <a class="dropdown-hub-item" href="/contact" target="_blank">
+                    <i class="bi bi-question-circle me-3 text-info fs-6"></i>Help & Support
+                </a>
+            </li>
+            
+            <li class="border-top border-secondary border-opacity-10 mt-1 pt-1">
+                <a class="dropdown-hub-item text-danger fw-bold" href="/logout">
+                    <i class="bi bi-box-arrow-right me-3 fs-6"></i>Logout Account
+                </a>
+            </li>
+        </ul>
+    </div>
+</header>
+
+<!-- STATS CARDS (TOTAL EARNINGS CARD FIX) -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-md-4">
+        <div class="stat-card border-0 p-4" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important; color: white !important; position: relative; overflow: hidden; border-radius: 24px;">
+            <div style="position: relative; z-index: 2;">
+                <h6 class="text-uppercase small opacity-90 fw-bold mb-3" style="color: white !important;">Total Earnings</h6>
+                <h2 class="display-6 fw-bold mb-3" style="color: white !important;">₹ {{ "{:,.2f}".format(total_earnings) }}</h2>
+                <span class="badge rounded-pill py-2 px-3 small fw-bold" style="background-color: rgba(255, 255, 255, 0.25) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.4);">
+                    +3.2% vs last month
+                </span>
+            </div>
+            <i class="bi bi-currency-rupee" style="position: absolute; right: -10px; bottom: -20px; font-size: 8rem; opacity: 0.18; color: white;"></i>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+        <div class="stat-card p-4">
+            <h6 class="text-uppercase text-muted small fw-bold mb-3">Pending Requests</h6>
+            <h2 class="display-6 fw-bold mb-2">{{ students|length }}</h2>
+            <p class="mb-0 text-muted small"><i class="bi bi-clock-history me-1"></i> For {{ current_month }}</p>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-4">
+        <div class="stat-card p-4">
+            <h6 class="text-uppercase text-muted small fw-bold mb-3">Grade Group</h6>
+            <h2 class="display-8 fw-bold text-primary mb-2">{{ teacher.grade }}</h2>
+            <p class="mb-0 text-muted small"><i class="bi bi-person-badge me-1"></i> {{ teacher.tutor_type }}</p>
+        </div>
+    </div>
+</div>
+
+
+
+        <!-- MAIN TABLE & ATTENDANCE CHART -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="glass-card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                        <h5 class="fw-bold mb-0">Recent Inquiries</h5>
+                        <div class="btn-group p-1 bg-secondary bg-opacity-10 rounded-pill">
+                            <button class="btn btn-sm btn-white rounded-pill px-3 shadow-sm border-0" onclick="filterStudents('all')">All</button>
+                            <button class="btn btn-sm text-muted px-3 border-0" onclick="filterStudents('Pending')">Pending</button>
+                            <button class="btn btn-sm text-muted px-3 border-0" onclick="filterStudents('Completed')">Active</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0" id="studentTable">
+                            <thead class="text-muted small text-uppercase border-bottom">
+                                <tr>
+                                    <th class="ps-0">Parent Details</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req in students %}
+                                <tr class="student-row" data-status="{{ req.status }}">
+                                    <td class="py-3 ps-0">
+                                        <div class="fw-bold">{{ req.parent_name }}</div>
+                                        <div class="small text-muted">{{ req.parent_phone }}</div>
+                                    </td>
+<td>
+    <span class="badge rounded-pill bg-warning px-3 py-2 fs-7">
+        {{ req.status }}
+    </span>
+</td>
+                                    <td class="text-end pe-0">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a href="/move-to-active/{{ req.id }}" class="btn-action-circle" title="Accept Inquiry">
+                                                <i class="bi bi-check2 text-success fs-5"></i>
+                                            </a>
+                                            <a href="https://wa.me/{{ req.parent_phone }}" class="btn-action-circle" target="_blank" title="WhatsApp Chat">
+                                                <i class="bi bi-whatsapp text-primary fs-5"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CIRCULAR ATTENDANCE GRAPH -->
+            <!-- CIRCULAR ATTENDANCE GRAPH & BUTTON FIX -->
+<div class="col-lg-4">
+    <div class="glass-card p-4 text-center h-100 d-flex flex-column justify-content-between" style="min-height: 350px;">
+        <div>
+            <h6 class="text-uppercase text-muted small fw-bold mb-4">Monthly Attendance</h6>
+            
+            <div class="position-relative d-inline-block mx-auto mb-3" style="width: 140px; height: 140px;">
+                <svg viewBox="0 0 36 36" style="transform: rotate(-90deg);">
+                    <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(125,125,125,0.15)" stroke-width="3"></circle>
+                    <circle cx="18" cy="18" r="16" fill="none" stroke="#6366f1" stroke-width="3" 
+                            stroke-dasharray="{{ attendance_pct }}, 100" stroke-linecap="round" 
+                            style="transition: stroke-dasharray 1s ease-in-out;"></circle>
+                </svg>
+                <div class="position-absolute top-50 start-50 translate-middle">
+                    <h2 class="fw-bold mb-0" style="color: var(--text-main) !important;">{{ attendance_pct }}%</h2>
+                    <span class="text-muted small fw-bold">AVG.</span>
+                </div>
+            </div>
+            <p class="text-muted small px-2 mb-0">Student consistency for <strong>{{ current_month }}</strong>.</p>
+        </div>
+
+        <!-- VISIBILITY FIXED BUTTON -->
+        <div class="mt-3">
+            <a href="/attendance-dashboard" style="color: #ffffff;"class="btn btn-outline-glass w-100 rounded-pill fw-bold py-2 shadow-sm">
+                View Full Report
+            </a>
+        </div>
+    </div>
+</div>
+        </div>
+
+        <!-- QUICK ACTION TILES HUB -->
+<div class="hub-container my-4">
+    <div class="hub-premium-bar p-3">
+        <div class="row g-3 row-cols-2 row-cols-sm-3 row-cols-md-6 align-items-center">
+            
+            <!-- 1. PROFILE TILE -->
+            <div class="col">
+                <a href="/edit-teacher-profile" class="hub-link">
+                    <div class="action-tile profile-tile">
+                        <div class="profile-avatar-md">
+                            {{ teacher.name[0] }}
+                            <div class="edit-badge-sm"><i class="bi bi-pencil-fill"></i></div>
+                        </div>
+                        <span class="tile-label text-truncate w-100 text-center">{{ teacher.name }}</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 2. STUDENTS TILE -->
+            <div class="col">
+                <a href="/my-students" class="hub-link text-center">
+                    <div class="action-tile tile-blue">
+                        <i class="bi bi-people-fill"></i>
+                        <span class="tile-label">STUDENTS</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 3. ATTENDANCE TILE -->
+            <div class="col">
+                <a href="/attendance-dashboard" class="hub-link text-center">
+                    <div class="action-tile tile-purple">
+                        <i class="bi bi-calendar2-check-fill"></i>
+                        <span class="tile-label">ATTENDANCE</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 4. FEES TILE -->
+            <div class="col">
+                <a href="/collect-fee" class="hub-link text-center">
+                    <div class="action-tile tile-green">
+                        <i class="bi bi-currency-rupee"></i>
+                        <span class="tile-label">FEES</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 5. NOTICE TILE -->
+            <div class="col">
+                <a href="/broadcast-notice" class="hub-link text-center">
+                    <div class="action-tile tile-amber">
+                        <i class="bi bi-megaphone-fill"></i>
+                        <span class="tile-label">NOTICES</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- 6. SUBSCRIPTION TILE -->
+            <div class="col">
+                <a href="/manage-subscription" class="hub-link text-center">
+                    <div class="action-tile tile-cyan">
+                        <i class="bi bi-credit-card-2-front-fill"></i>
+                        <span class="tile-label">SUBSCRIPTION</span>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+    </main>
+
+
+    <script>
+        function filterStudents(status) {
+            const rows = document.querySelectorAll('.student-row');
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute('data-status');
+                if (status === 'all' || rowStatus === status) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleIcons(newTheme);
+        }
+
+        function updateToggleIcons(theme) {
+            const darkIcons = document.querySelectorAll('.dark-icon');
+            const lightIcons = document.querySelectorAll('.light-icon');
+            if (theme === 'dark') {
+                darkIcons.forEach(el => el.classList.add('d-none'));
+                lightIcons.forEach(el => el.classList.remove('d-none'));
+            } else {
+                darkIcons.forEach(el => el.classList.remove('d-none'));
+                lightIcons.forEach(el => el.classList.add('d-none'));
+            }
+        }
+
+        function toggleDropdownMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('settingsMenu');
+            menu.classList.toggle('d-none');
+        }
+
+        window.onclick = function(event) {
+            const menu = document.getElementById('settingsMenu');
+            if (menu && !menu.classList.contains('d-none')) {
+                menu.classList.add('d-none');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            updateToggleIcons(savedTheme);
+        });
+    </script>
+{% endblock %}

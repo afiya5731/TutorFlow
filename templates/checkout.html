@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout & Payment | TutorFlow{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="glass-card p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="badge bg-purple-subtle text-purple rounded-pill px-3 py-1 fw-bold mb-2">🔒 Secure Checkout</span>
+                    <h3 class="fw-bold">{{ display_title }}</h3>
+                    <p class="text-muted small">Start your 14-day trial. Cancel anytime before renewal.</p>
+                </div>
+
+                <div class="p-3 rounded-4 mb-4" style="background: var(--input-bg); border: 1px solid var(--glass-border);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong class="d-block text-main">Pro Educator (Monthly)</strong>
+                            <small class="text-muted">14 Days Free Trial</small>
+                        </div>
+                        <span class="fs-4 fw-bold text-success">₹0.00</span>
+                    </div>
+                </div>
+
+                <form action="/process-subscription" method="POST">
+                    <input type="hidden" name="plan_choice" value="Pro Educator">
+                    
+                    <h6 class="fw-bold mb-3">Select Payment Option:</h6>
+                    <div class="d-flex flex-column gap-2 mb-4">
+                        <label class="p-3 rounded-3 d-flex align-items-center justify-content-between" style="background: var(--input-bg); border: 1px solid var(--glass-border); cursor: pointer;">
+                            <div>
+                                <input type="radio" name="payment_method" value="upi" checked class="me-2">
+                                <strong>UPI / QR Code (PhonePe, GPay, Paytm)</strong>
+                            </div>
+                            <i class="bi bi-qr-code-scan text-purple fs-5"></i>
+                        </label>
+
+                        <label class="p-3 rounded-3 d-flex align-items-center justify-content-between" style="background: var(--input-bg); border: 1px solid var(--glass-border); cursor: pointer;">
+                            <div>
+                                <input type="radio" name="payment_method" value="card" class="me-2">
+                                <strong>Credit / Debit Card</strong>
+                            </div>
+                            <i class="bi bi-credit-card-2-front text-primary fs-5"></i>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-glow w-100 py-3 fw-bold fs-6">
+                        🚀 Activate 14-Day Free Trial Now
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

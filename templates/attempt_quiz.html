@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attempt Quiz | TutorFlow</title>
+    
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(226, 232, 240, 0.8);
+            --glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            --header-grad: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #090d16;
+            --card-bg: rgba(20, 27, 44, 0.75);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            --header-grad: linear-gradient(135deg, #2e1065 0%, #020617 100%);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        .header-section {
+            background: var(--header-grad);
+            padding: 30px 0 60px 0;
+            color: white;
+            border-radius: 0 0 35px 35px;
+        }
+
+        .quiz-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .question-box {
+            background: rgba(125, 125, 125, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .option-label {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .option-label:hover {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.08);
+        }
+
+        .btn-glow {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+            color: white !important;
+            border: none;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-section text-center">
+        <div class="container">
+            <a href="/student/study-material" class="btn btn-sm btn-outline-light rounded-pill px-3 mb-2 text-decoration-none">
+                <i class="bi bi-arrow-left me-1"></i> Back to Materials
+            </a>
+            <h2 class="fw-bold mb-0">{{ quiz.title }}</h2>
+            <p class="opacity-75 small m-0">{{ quiz.grade }} &bull; Total Questions: {{ questions|length }}</p>
+        </div>
+    </header>
+
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="quiz-card">
+                    {% if submission %}
+                    <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-3" style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3);">
+                        <span class="fw-bold text-success"><i class="bi bi-check2-circle me-1"></i> Already Attempted</span>
+                        <span class="badge bg-success rounded-pill px-3 py-2 fs-6">Score: {{ submission.score }}/{{ submission.total }}</span>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST">
+                        {% for q in questions %}
+                        {% set q_idx = loop.index0 %}
+                        <div class="question-box mb-4">
+                            <h6 class="fw-bold mb-3">{{ loop.index }}. {{ q.question }}</h6>
+                            <div class="d-flex flex-column gap-2">
+                                {% for opt in q.options %}
+                                <label class="option-label">
+                                    <input type="radio" name="question_{{ q_idx }}" value="{{ opt }}" required>
+                                    <span>{{ opt }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-glow w-100 py-3 fw-bold rounded-pill fs-6">
+                            Submit Test & View Result &rarr;
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+    </script>
+</body>
+</html>
