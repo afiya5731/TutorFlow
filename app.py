@@ -41,7 +41,7 @@ app.config['MAIL_PASSWORD'] = 'iobxtivpaxqjvahh'  # 16-digit app password
 app.config['MAIL_DEFAULT_SENDER'] = ('TutorFlow Team', 'tutorflowonline@gmail.com')
 
 mail = Mail(app)
-===========================================================
+#===========================================================
 # 🗂️ DATABASE MODELS (SABSE PEHLE DEFINE HONGE)
 # ==============================================================================
 
