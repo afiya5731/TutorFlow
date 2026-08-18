@@ -41,11 +41,7 @@ app.config['MAIL_PASSWORD'] = 'iobxtivpaxqjvahh'  # 16-digit app password
 app.config['MAIL_DEFAULT_SENDER'] = ('TutorFlow Team', 'tutorflowonline@gmail.com')
 
 mail = Mail(app)
-mail = Mail(app)
-
-
-mail = Mail(app)
-# ==============================================================================
+===========================================================
 # 🗂️ DATABASE MODELS (SABSE PEHLE DEFINE HONGE)
 # ==============================================================================
 
@@ -228,17 +224,14 @@ def register():
         db.session.add(new_teacher)
         db.session.commit()
 
+        # Dynamic HTTPS verification link for Render
         base_url = request.host_url.rstrip('/')
         if request.headers.get('X-Forwarded-Proto') == 'https' and base_url.startswith('http://'):
             base_url = base_url.replace('http://', 'https://', 1)
 
         verification_link = f"{base_url}/verify-email/{new_teacher.id}"
         
-        msg = Message(
-            subject="Verify Your TutorFlow Account",
-            sender=app.config['MAIL_DEFAULT_SENDER'],
-            recipients=[email]
-        )
+        msg = Message("Verify Your TutorFlow Account", recipients=[email])
         msg.html = f"""
             <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
                 <h2 style="color: #6366f1;">Welcome to TutorFlow!</h2>
@@ -251,21 +244,18 @@ def register():
             </div>
         """
         
-        # Direct Send with clear error printing
         try:
             mail.send(msg)
-            print(f"✅ Mail successfully sent to: {email}")
+            print(f"✅ EMAIL SENT SUCCESSFULLY TO {email}")
             flash("✨ Registration Successful! Please check your email inbox/spam folder to verify your account.", "success")
         except Exception as e:
-            print(f"❌ MAIL SENDING FAILED ON SERVER: {e}")
+            print(f"❌ RENDER SMTP ERROR: {e}")
             flash(f"⚠️ Account created, but email could not be sent: {e}", "warning")
 
         return redirect('/teacher-login')
         
     return render_template('register.html')
-        
-    return render_template('register.html')
-
+    
 @app.route('/teacher-login', methods=['GET', 'POST'])
 def teacher_login():
     if request.method == 'POST':
