@@ -30,12 +30,16 @@ if db_url and db_url.startswith("postgres://"):
 # Database instance initialisation
 
 
+# --- RENDER CLOUD PRODUCTION MAIL CONFIG (SSL PORT 465) ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'tutorflowonline@gmail.com'  # <-- Yahan apni Gmail id dalein
-app.config['MAIL_PASSWORD'] = 'iobx tivp axqj vahh'  # <-- Gmail ka 16-digit 'App Password' dalein
-app.config['MAIL_DEFAULT_SENDER'] = 'tutorflowonline@gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'tutorflowonline@gmail.com'
+app.config['MAIL_PASSWORD'] = 'iobxtivpaxqjvahh'  # Bina spaces ke 16-digit password
+app.config['MAIL_DEFAULT_SENDER'] = ('TutorFlow Team', 'tutorflowonline@gmail.com')
+
+mail = Mail(app)
 
 
 mail = Mail(app)
@@ -226,7 +230,8 @@ def register():
         #verification_link = f"https://tutorFlow-axnt.onrender.com/verify-email/{new_teacher.id}"
         # 👑 FIXED: Dynamic Host Link Matrix (Local aur Render dono par automatic chalega)
         base_url = request.host_url.rstrip('/')
-        verification_link = f"{base_url}/verify-email/{new_teacher.id}"
+        if request.headers.get('X-Forwarded-Proto') == 'https' and base_url.startswith('http://'):
+            base_url = base_url.replace('http://', 'https://', 1)
         
         msg = Message("Verify Your TutorFlow Account", recipients=[email])
         msg.html = f"""
