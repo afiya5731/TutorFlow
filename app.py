@@ -31,14 +31,16 @@ if db_url and db_url.startswith("postgres://"):
 
 
 # --- RENDER CLOUD PRODUCTION MAIL CONFIG (SSL PORT 465) ---
+# Gmail SSL Configuration
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USERNAME'] = 'tutorflowonline@gmail.com'
-app.config['MAIL_PASSWORD'] = 'iobxtivpaxqjvahh'  # Bina spaces ke 16-digit password
+app.config['MAIL_PASSWORD'] = 'iobxtivpaxqjvahh'  # 16-digit app password
 app.config['MAIL_DEFAULT_SENDER'] = ('TutorFlow Team', 'tutorflowonline@gmail.com')
 
+mail = Mail(app)
 mail = Mail(app)
 
 
@@ -204,7 +206,7 @@ def register():
         if existing_teacher:
             flash("⚠️ Error: This email address is already registered!", "danger")
             return redirect('/register')
-        # 👑 MULTIPLE VALUES FETCH & CONVERT TO COMMA-SEPARATED STRING
+        
         selected_subjects = request.form.getlist('subject')
         selected_grades = request.form.getlist('grade')
 
@@ -217,23 +219,26 @@ def register():
             password=request.form.get('password'),
             phone=formatted_phone, 
             area=request.form.get('area', 'Global'),
-            subject=subject_str,    # Stores: "Mathematics, Physics, Computer Science"
-            grade=grade_str,        # Stores: "High School (9-10), Higher Secondary (11-12)"
+            subject=subject_str,
+            grade=grade_str,
             tutor_type=request.form.get('tutor_type'),
             is_verified=False
         )
         
         db.session.add(new_teacher)
         db.session.commit()
-        # ... Rest of verification mail dispatch logic ...
 
-        #verification_link = f"https://tutorFlow-axnt.onrender.com/verify-email/{new_teacher.id}"
-        # 👑 FIXED: Dynamic Host Link Matrix (Local aur Render dono par automatic chalega)
         base_url = request.host_url.rstrip('/')
         if request.headers.get('X-Forwarded-Proto') == 'https' and base_url.startswith('http://'):
             base_url = base_url.replace('http://', 'https://', 1)
+
+        verification_link = f"{base_url}/verify-email/{new_teacher.id}"
         
-        msg = Message("Verify Your TutorFlow Account", recipients=[email])
+        msg = Message(
+            subject="Verify Your TutorFlow Account",
+            sender=app.config['MAIL_DEFAULT_SENDER'],
+            recipients=[email]
+        )
         msg.html = f"""
             <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
                 <h2 style="color: #6366f1;">Welcome to TutorFlow!</h2>
@@ -246,16 +251,18 @@ def register():
             </div>
         """
         
+        # Direct Send with clear error printing
         try:
             mail.send(msg)
-            print("Email sent successfully on production server!")
+            print(f"✅ Mail successfully sent to: {email}")
+            flash("✨ Registration Successful! Please check your email inbox/spam folder to verify your account.", "success")
         except Exception as e:
-            print(f"SMTP Server Log Error: {e}")
-            flash("⚠️ Registration done, but failed to send verification email. Please contact admin.", "warning")
-            return redirect('/register')
+            print(f"❌ MAIL SENDING FAILED ON SERVER: {e}")
+            flash(f"⚠️ Account created, but email could not be sent: {e}", "warning")
 
-        flash("✨ Registration Successful! Please check your email to verify your account before logging in.", "success")
         return redirect('/teacher-login')
+        
+    return render_template('register.html')
         
     return render_template('register.html')
 
