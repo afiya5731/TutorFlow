@@ -226,9 +226,6 @@ def register():
 
         # Dynamic HTTPS verification link for Render
         base_url = request.host_url.rstrip('/')
-        if request.headers.get('X-Forwarded-Proto') == 'https' and base_url.startswith('http://'):
-            base_url = base_url.replace('http://', 'https://', 1)
-
         verification_link = f"{base_url}/verify-email/{new_teacher.id}"
         
         msg = Message("Verify Your TutorFlow Account", recipients=[email])
