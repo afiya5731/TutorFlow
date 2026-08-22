@@ -32,7 +32,7 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USERNAME'] = 'tutorflowonline@gmail.com'
 app.config['MAIL_PASSWORD'] = 'iobxtivpaxqjvahh'  # 16-digit App Password
 app.config['MAIL_DEFAULT_SENDER'] = 'tutorflowonline@gmail.com'
-app.config['MAIL_TIMEOUT'] = 5  # 5s strict timeout to avoid 502 crashes
+
 
 
 mail = Mail(app)
@@ -172,6 +172,19 @@ def index():
     teachers = query.all()
     return render_template('index.html', teachers=teachers)
 
+# Background helper
+def send_async_email(app_instance, msg):
+    with app_instance.app_context():
+        try:
+            mail.send(msg)
+            print("Email sent successfully!")
+        except Exception as e:
+            print(f"SMTP Error: {e}")
+
+# Register route ke andar:
+thr = threading.Thread(target=send_async_email, args=[app, msg])
+thr.start()
+
 @app.route('/verify-email/<int:t_id>')
 def verify_email(t_id):
     teacher = Teacher.query.get_or_404(t_id)
@@ -273,14 +286,7 @@ def teacher_login():
     return render_template('teacher_login.html')
 
 # --- ✉️ CLOUD-SAFE BACKGROUND EMAIL SENDING FUNCTION ---
-def send_async_email(app_instance, msg):
-    # Explicitly app context ko block scope ke andar ensure karein
-    with app_instance.app_context():
-        try:
-            mail.send(msg)
-            print("Email sent successfully from Render cloud production environment!")
-        except Exception as e:
-            print(f"Render SMTP Delivery Failure Exception Details: {e}")
+
 
 
 # --- 📝 REGISTER ROUTE (COMPLETELY SAFE FROM SYNTAX ERRORS) ---
