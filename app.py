@@ -190,46 +190,56 @@ def register():
         if existing_teacher:
             flash("⚠️ Error: This email address is already registered!", "danger")
             return redirect('/register')
-        
+        # 👑 MULTIPLE VALUES FETCH & CONVERT TO COMMA-SEPARATED STRING
         selected_subjects = request.form.getlist('subject')
         selected_grades = request.form.getlist('grade')
 
         subject_str = ", ".join(selected_subjects) if selected_subjects else "All Subjects"
         grade_str = ", ".join(selected_grades) if selected_grades else "All Grades"
 
-        # 👑 is_verified ko True rakhein taaki Render port block hone par bhi user login kar sake
         new_teacher = Teacher(
             name=request.form.get('name'),
             email=email,
             password=request.form.get('password'),
+            phone=formatted_phone, 
             area=request.form.get('area', 'Global'),
-            subject=subject_str,
-            grade=grade_str,
+            subject=subject_str,    # Stores: "Mathematics, Physics, Computer Science"
+            grade=grade_str,        # Stores: "High School (9-10), Higher Secondary (11-12)"
             tutor_type=request.form.get('tutor_type'),
-            is_verified=True  # Instant verified
+            is_verified=False
         )
         
         db.session.add(new_teacher)
         db.session.commit()
+        # ... Rest of verification mail dispatch logic ...
 
-        # Background thread me mail bhejne ki try karein (Agar Render block bhi kare, 502 nahi aayega)
+        #verification_link = f"https://tutorFlow-axnt.onrender.com/verify-email/{new_teacher.id}"
+        # 👑 FIXED: Dynamic Host Link Matrix (Local aur Render dono par automatic chalega)
+        base_url = request.host_url.rstrip('/')
+        verification_link = f"{base_url}/verify-email/{new_teacher.id}"
+        
+        msg = Message("Verify Your TutorFlow Account", recipients=[email])
+        msg.html = f"""
+            <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                <h2 style="color: #6366f1;">Welcome to TutorFlow!</h2>
+                <p>Hello {new_teacher.name},</p>
+                <p>Thank you for registering as an instructor. Please click the button below to verify your email and activate your account:</p>
+                <a href="{verification_link}" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 15px 0;">Verify Email Address</a>
+                <p style="font-size: 0.8rem; color: #666;">If the button doesn't work, copy-paste this link into your browser:<br>{verification_link}</p>
+                <br>
+                <p>Best Regards,<br>TutorFlow Team</p>
+            </div>
+        """
+        
         try:
-            base_url = request.host_url.rstrip('/')
-            msg = Message("Welcome to TutorFlow!", recipients=[email])
-            msg.html = f"""
-                <div style="font-family: Arial, sans-serif; padding: 20px;">
-                    <h2>Welcome to TutorFlow, {new_teacher.name}!</h2>
-                    <p>Your instructor account has been created and activated successfully.</p>
-                    <a href="{base_url}/teacher-login">Click here to Login</a>
-                </div>
-            """
-            thr = threading.Thread(target=send_async_email, args=[app, msg])
-            thr.daemon = True
-            thr.start()
+            mail.send(msg)
+            print("Email sent successfully on production server!")
         except Exception as e:
-            print(f"Mail dispatch skipped: {e}")
+            print(f"SMTP Server Log Error: {e}")
+            flash("⚠️ Registration done, but failed to send verification email. Please contact admin.", "warning")
+            return redirect('/register')
 
-        flash("✨ Registration Successful! You can now log in to your account.", "success")
+        flash("✨ Registration Successful! Please check your email to verify your account before logging in.", "success")
         return redirect('/teacher-login')
         
     return render_template('register.html')
