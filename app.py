@@ -10,20 +10,31 @@ import os
 import calendar
 
 
+import os
+
 app = Flask(__name__)
 app.secret_key = 'your_very_secret_key_here_bhopal_2026'
 
-# --- DYNAMIC DATABASE CONFIGURATION (NEON / RENDER / LOCAL) ---
+# Neon / PostgreSQL URI
 db_url = os.environ.get("DATABASE_URL", "sqlite:///database.db")
 
-# Render/Neon postgres prefix fix
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# 🔥 CRITICAL FIX: Neon & Cloud DB Connection Pool settings
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,       # Closed connection ko auto-detect karke reconnect karega
+    "pool_recycle": 300,         # Har 5 minute me connection fresh karega
+    "pool_timeout": 20,          # Connection wait timeout
+    "max_overflow": 0            # Free tier connection limits cross nahi honge
+}
+
 db = SQLAlchemy(app)
+
+
 # --- 100% TIMEOUT-SAFE GMAIL CONFIGURATION FOR RENDER ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
@@ -221,9 +232,10 @@ def register():
         except Exception as db_err:
             db.session.rollback()
             print(f"Database Error: {db_err}")
-            flash(f"❌ Database error: {db_err}", "danger")
+            flash("❌ A database error occurred during registration.", "danger")
             return redirect('/register')
 
+        # Link Generation
         base_url = request.host_url.rstrip('/')
         verification_link = f"{base_url}/verify-email/{new_teacher.id}"
         
@@ -232,21 +244,21 @@ def register():
             <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
                 <h2 style="color: #6366f1;">Welcome to TutorFlow!</h2>
                 <p>Hello {new_teacher.name},</p>
-                <p>Thank you for registering. Please click below to verify your account:</p>
+                <p>Please click below to verify your account:</p>
                 <a href="{verification_link}" style="display: inline-block; background: #6366f1; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold;">Verify Email Address</a>
                 <br><br>
                 <p>Best Regards,<br>TutorFlow Team</p>
             </div>
         """
         
+        # Safe Background Mail Dispatch
         try:
-            mail.send(msg)
-        except Exception as e:
-            print(f"SMTP Error: {e}")
-            flash("⚠️ Account created, but verification email failed to send. Please contact admin.", "warning")
-            return redirect('/teacher-login')
+            thr = threading.Thread(target=send_async_email, args=[app, msg])
+            thr.start()
+        except Exception as mail_err:
+            print(f"Async Thread Error: {mail_err}")
 
-        flash("✨ Registration Successful! Please check your email to verify your account.", "success")
+        flash("✨ Registration Successful! Please check your email to verify your account before logging in.", "success")
         return redirect('/teacher-login')
         
     return render_template('register.html')
