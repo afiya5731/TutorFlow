@@ -172,18 +172,7 @@ def index():
     teachers = query.all()
     return render_template('index.html', teachers=teachers)
 
-# Background helper
-def send_async_email(app_instance, msg):
-    with app_instance.app_context():
-        try:
-            mail.send(msg)
-            print("Email sent successfully!")
-        except Exception as e:
-            print(f"SMTP Error: {e}")
 
-# Register route ke andar:
-thr = threading.Thread(target=send_async_email, args=[app, msg])
-thr.start()
 
 @app.route('/verify-email/<int:t_id>')
 def verify_email(t_id):
@@ -262,6 +251,7 @@ def register():
         
     return render_template('register.html')
         
+
 
 @app.route('/teacher-login', methods=['GET', 'POST'])
 def teacher_login():
@@ -1394,6 +1384,20 @@ def delete_quiz(quiz_id):
         db.session.commit()
         flash("Quiz and its submission records deleted successfully.", "info")
     return redirect('/teacher/study-material')
-  
+
+# Background helper
+def send_async_email(app_instance, msg):
+    with app_instance.app_context():
+        try:
+            mail.send(msg)
+            print("Email sent successfully!")
+        except Exception as e:
+            print(f"SMTP Error: {e}")
+
+# Register route ke andar:
+thr = threading.Thread(target=send_async_email, args=[app, msg])
+thr.start()
+
+
 if __name__ == '__main__':
     app.run(debug=True)
