@@ -9,8 +9,14 @@ import io
 import calendar
 
 app = Flask(__name__)
-app.secret_key = 'your_very_secret_key_here_bhopal_2026'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+db_url = os.environ.get("DATABASE_URL")
+
+# Fix agar postgres:// aaye toh
+if db_url and db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 # --- 100% TIMEOUT-SAFE GMAIL CONFIGURATION FOR RENDER ---
