@@ -194,7 +194,7 @@ def register():
         if existing_teacher:
             flash("⚠️ Error: This email address is already registered!", "danger")
             return redirect('/register')
-        # 👑 MULTIPLE VALUES FETCH & CONVERT TO COMMA-SEPARATED STRING
+
         selected_subjects = request.form.getlist('subject')
         selected_grades = request.form.getlist('grade')
 
@@ -207,18 +207,21 @@ def register():
             password=request.form.get('password'),
             phone=formatted_phone, 
             area=request.form.get('area', 'Global'),
-            subject=subject_str,    # Stores: "Mathematics, Physics, Computer Science"
-            grade=grade_str,        # Stores: "High School (9-10), Higher Secondary (11-12)"
+            subject=subject_str,
+            grade=grade_str,
             tutor_type=request.form.get('tutor_type'),
             is_verified=False
         )
         
-        db.session.add(new_teacher)
-        db.session.commit()
-        # ... Rest of verification mail dispatch logic ...
+        try:
+            db.session.add(new_teacher)
+            db.session.commit()
+        except Exception as db_err:
+            db.session.rollback()
+            print(f"Database Error: {db_err}")
+            flash(f"❌ Database error: {db_err}", "danger")
+            return redirect('/register')
 
-        #verification_link = f"https://tutorFlow-axnt.onrender.com/verify-email/{new_teacher.id}"
-        # 👑 FIXED: Dynamic Host Link Matrix (Local aur Render dono par automatic chalega)
         base_url = request.host_url.rstrip('/')
         verification_link = f"{base_url}/verify-email/{new_teacher.id}"
         
@@ -227,23 +230,21 @@ def register():
             <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
                 <h2 style="color: #6366f1;">Welcome to TutorFlow!</h2>
                 <p>Hello {new_teacher.name},</p>
-                <p>Thank you for registering as an instructor. Please click the button below to verify your email and activate your account:</p>
-                <a href="{verification_link}" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 15px 0;">Verify Email Address</a>
-                <p style="font-size: 0.8rem; color: #666;">If the button doesn't work, copy-paste this link into your browser:<br>{verification_link}</p>
-                <br>
+                <p>Thank you for registering. Please click below to verify your account:</p>
+                <a href="{verification_link}" style="display: inline-block; background: #6366f1; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold;">Verify Email Address</a>
+                <br><br>
                 <p>Best Regards,<br>TutorFlow Team</p>
             </div>
         """
         
         try:
             mail.send(msg)
-            print("Email sent successfully on production server!")
         except Exception as e:
-            print(f"SMTP Server Log Error: {e}")
-            flash("⚠️ Registration done, but failed to send verification email. Please contact admin.", "warning")
-            return redirect('/register')
+            print(f"SMTP Error: {e}")
+            flash("⚠️ Account created, but verification email failed to send. Please contact admin.", "warning")
+            return redirect('/teacher-login')
 
-        flash("✨ Registration Successful! Please check your email to verify your account before logging in.", "success")
+        flash("✨ Registration Successful! Please check your email to verify your account.", "success")
         return redirect('/teacher-login')
         
     return render_template('register.html')
