@@ -8,8 +8,9 @@ import sys
 import io
 import os
 import calendar
-
-
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import os
 
 app = Flask(__name__)
@@ -183,14 +184,26 @@ def index():
     teachers = query.all()
     return render_template('index.html', teachers=teachers)
 
-def send_async_email(app_instance, msg):
-    with app_instance.app_context():
-        try:
-            mail.send(msg)
-            print("Email sent successfully!")
-        except Exception as e:
-            print(f"SMTP Error: {e}")
+def send_gmail_direct(to_email, subject, html_body):
+    sender_email = "tutorflowonline@gmail.com"
+    app_password = "iobxtivpaxqjvahh"  # 16-digit Gmail App Password
 
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = f"TutorFlow <{sender_email}>"
+    msg["To"] = to_email
+
+    part = MIMEText(html_body, "html")
+    msg.attach(part)
+
+    try:
+        # 5-second strict timeout: Kabhi 502 Bad Gateway nahi aayega
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=5) as server:
+            server.login(sender_email, app_password)
+            server.sendmail(sender_email, to_email, msg.as_string())
+        print(f"✅ Email delivered to {to_email}")
+    except Exception as e:
+        print(f"❌ Direct Gmail Delivery Error: {e}")
 @app.route('/verify-email/<int:t_id>')
 def verify_email(t_id):
     teacher = Teacher.query.get_or_404(t_id)
@@ -213,7 +226,7 @@ def register():
         if existing_teacher:
             flash("⚠️ Error: This email address is already registered!", "danger")
             return redirect('/register')
-
+        
         selected_subjects = request.form.getlist('subject')
         selected_grades = request.form.getlist('grade')
 
@@ -232,42 +245,40 @@ def register():
             is_verified=False
         )
         
-        try:
-            db.session.add(new_teacher)
-            db.session.commit()
-        except Exception as db_err:
-            db.session.rollback()
-            print(f"Database Error: {db_err}")
-            flash("❌ A database error occurred during registration.", "danger")
-            return redirect('/register')
+        db.session.add(new_teacher)
+        db.session.commit()
 
-        # Link Generation
+        # Dynamic Host Link for Render
         base_url = request.host_url.rstrip('/')
+        if request.headers.get('X-Forwarded-Proto') == 'https' and base_url.startswith('http://'):
+            base_url = base_url.replace('http://', 'https://', 1)
+
         verification_link = f"{base_url}/verify-email/{new_teacher.id}"
         
-        msg = Message("Verify Your TutorFlow Account", recipients=[email])
-        msg.html = f"""
+        email_html = f"""
             <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
                 <h2 style="color: #6366f1;">Welcome to TutorFlow!</h2>
                 <p>Hello {new_teacher.name},</p>
-                <p>Please click below to verify your account:</p>
-                <a href="{verification_link}" style="display: inline-block; background: #6366f1; color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold;">Verify Email Address</a>
-                <br><br>
+                <p>Thank you for registering as an instructor. Please click the button below to verify your email and activate your account:</p>
+                <a href="{verification_link}" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 15px 0;">Verify Email Address</a>
+                <p style="font-size: 0.8rem; color: #666;">If the button doesn't work, copy-paste this link into your browser:<br>{verification_link}</p>
+                <br>
                 <p>Best Regards,<br>TutorFlow Team</p>
             </div>
         """
         
-        # Safe Background Mail Dispatch
-        try:
-            thr = threading.Thread(target=send_async_email, args=[app, msg])
-            thr.start()
-        except Exception as mail_err:
-            print(f"Async Thread Error: {mail_err}")
+        # 👑 Non-blocking Daemon Thread (502 kabhi nahi aayega)
+        threading.Thread(
+            target=send_gmail_direct, 
+            args=(email, "Verify Your TutorFlow Account", email_html),
+            daemon=True
+        ).start()
 
-        flash("✨ Registration Successful! Please check your email to verify your account before logging in.", "success")
+        flash("✨ Registration Successful! Please check your email inbox/spam folder to verify your account.", "success")
         return redirect('/teacher-login')
         
     return render_template('register.html')
+
         
 
 
