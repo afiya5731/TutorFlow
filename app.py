@@ -184,26 +184,27 @@ def index():
     teachers = query.all()
     return render_template('index.html', teachers=teachers)
 
-def send_gmail_direct(to_email, subject, html_body):
-    sender_email = "tutorflowonline@gmail.com"
-    app_password = "iobxtivpaxqjvahh"  # 16-digit Gmail App Password
+import requests
 
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = f"TutorFlow <{sender_email}>"
-    msg["To"] = to_email
-
-    part = MIMEText(html_body, "html")
-    msg.attach(part)
-
+def send_brevo_api_email(to_email, subject, html_content):
+    url = "https://api.brevo.com/v3/smtp/email"
+    headers = {
+        "accept": "application/json",
+        "api-key": "YOUR_BREVO_API_KEY",  # Brevo se free API key copy karein
+        "content-type": "application/json"
+    }
+    payload = {
+        "sender": {"name": "TutorFlow", "email": "tutorflowonline@gmail.com"},
+        "to": [{"email": to_email}],
+        "subject": subject,
+        "htmlContent": html_content
+    }
     try:
-        # 5-second strict timeout: Kabhi 502 Bad Gateway nahi aayega
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=5) as server:
-            server.login(sender_email, app_password)
-            server.sendmail(sender_email, to_email, msg.as_string())
-        print(f"✅ Email delivered to {to_email}")
+        response = requests.post(url, json=payload, headers=headers, timeout=5)
+        print(f"Brevo Status: {response.status_code}, {response.text}")
     except Exception as e:
-        print(f"❌ Direct Gmail Delivery Error: {e}")
+        print(f"API Error: {e}")
+        
 @app.route('/verify-email/<int:t_id>')
 def verify_email(t_id):
     teacher = Teacher.query.get_or_404(t_id)
@@ -242,7 +243,7 @@ def register():
             subject=subject_str,
             grade=grade_str,
             tutor_type=request.form.get('tutor_type'),
-            is_verified=False
+            is_verified=True
         )
         
         db.session.add(new_teacher)
