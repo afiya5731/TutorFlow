@@ -204,7 +204,28 @@ def send_brevo_api_email(to_email, subject, html_content):
         print(f"Brevo Status: {response.status_code}, {response.text}")
     except Exception as e:
         print(f"API Error: {e}")
-        
+def send_gmail_direct(to_email, subject, html_content):
+    sender_email = app.config['MAIL_USERNAME']
+    sender_password = app.config['MAIL_PASSWORD']
+    
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = sender_email
+    msg["To"] = to_email
+    
+    part = MIMEText(html_content, "html")
+    msg.attach(part)
+    
+    try:
+        # SSL Port 465 for Gmail
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as server:
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, to_email, msg.as_string())
+        print(f"✅ Verification email sent to {to_email}")
+    except Exception as e:
+        print(f"❌ Email sending failed: {e}")
+
+
 @app.route('/verify-email/<int:t_id>')
 def verify_email(t_id):
     teacher = Teacher.query.get_or_404(t_id)
