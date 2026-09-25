@@ -16,24 +16,20 @@ import os
 app = Flask(__name__)
 app.secret_key = 'your_very_secret_key_here_bhopal_2026'
 
-# Neon / PostgreSQL URI
-# db_url = os.environ.get("postgresql://neondb_owner:npg_Iqivbp8Bkc7O@ep-icy-lake-b5h49v39-pooler.c-7.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require", "sqlite:///database.db")
-
-# if db_url.startswith("postgres://"):
-#    db_url = db_url.replace("postgres://", "postgresql://", 1)
-
-
 # Direct Neon PostgreSQL URI
 NEON_URI = "postgresql://neondb_owner:npg_Iqivbp8Bkc7O@ep-icy-lake-b5h49v39-pooler.c-7.us-east-2.aws.neon.tech/neondb?sslmode=require"
 
 db_url = os.environ.get("DATABASE_URL", NEON_URI)
 
-if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql://", 1)
-
-# Remove incompatible channel_binding if present
+# Clean channel binding if present
 if "channel_binding=" in db_url:
     db_url = db_url.replace("&channel_binding=require", "").replace("?channel_binding=require&", "?").replace("channel_binding=require", "")
+
+# Explicitly use psycopg2 driver
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+elif db_url.startswith("postgresql://") and not db_url.startswith("postgresql+psycopg2://"):
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
