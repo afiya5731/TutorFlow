@@ -184,27 +184,27 @@ def index():
     teachers = query.all()
     return render_template('index.html', teachers=teachers)
 
+import os
 import requests
 
 def send_resend_email(to_email, subject, html_content):
-    api_key = os.environ.get("RESEND_API_KEY", "re_N4GAAd3H_PRZAMZuV8Y5LAqZ9u2wnVDMz")
+    api_key = os.environ.get("RESEND_API_KEY")
+    if not api_key:
+        print("❌ RESEND_API_KEY environment variable missing!")
+        return
+
     url = "https://api.resend.com/emails"
-    
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
     payload = {
-        # Resend default verified sender with your Brand Name:
         "from": "TutorFlow <onboarding@resend.dev>",
         "to": [to_email],
-        # Agar user reply karega to seedhe aapke gmail par aayega:
         "reply_to": "tutorflowonline@gmail.com",
         "subject": subject,
         "html": html_content
     }
-    
     try:
         response = requests.post(url, json=payload, headers=headers, timeout=10)
         print(f"Resend Status Code: {response.status_code}")
