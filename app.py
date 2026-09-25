@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.secret_key = 'your_very_secret_key_here_bhopal_2026'
 
 # Neon / PostgreSQL URI
-db_url = os.environ.get("DATABASE_URL", "sqlite:///database.db")
+db_url = os.environ.get("postgresql://neondb_owner:npg_qaCAMBhlct87@ep-lively-bonus-aym9axg9-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require", "sqlite:///database.db")
 
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
