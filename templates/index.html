@@ -4,7 +4,7 @@
 
 {% block extra_css %}
 <style>
-    /* HERO TYPOGRAPHY & BADGES */
+    /* HERO TYPOGRAPHY & BADGE
     .hero-heading {
         font-size: 3.5rem;
         font-weight: 800;
@@ -13,6 +13,30 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         line-height: 1.15;
+    }
+    /* HERO TYPOGRAPHY RESPONSIVE FIX */
+    .hero-heading {
+        /* Mobile par ~2.1rem rahega aur desktop par 3.5rem tak smoothly scale hoga */
+        font-size: clamp(2rem, 5.5vw, 3.4rem);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1.2;
+    }
+
+    /* Extra spacing & sub-text tuning for mobile */
+    @media (max-width: 768px) {
+        .hero-heading {
+            font-size: 2.1rem;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+        }
+        .hero-subtext {
+            font-size: 1rem !important;
+            line-height: 1.6;
+        }
     }
 
     .badge-hero {
