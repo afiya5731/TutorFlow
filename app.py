@@ -262,7 +262,7 @@ def register():
             subject=subject_str,
             grade=grade_str,
             tutor_type=request.form.get('tutor_type'),
-            is_verified=True
+            is_verified=False
         )
         
         db.session.add(new_teacher)
