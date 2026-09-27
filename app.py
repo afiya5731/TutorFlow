@@ -983,33 +983,27 @@ def contact():
             flash("Please fill all required fields.", "danger")
             return redirect('/contact')
             
-        # Professional Email Draft
-        subject = f"🚀 New Client Strategy Ticket: {purpose} from {name}"
-        msg = Message(subject, recipients=[app.config['MAIL_USERNAME']])
+        subject = f"🚀 New Contact Inbound Lead: {purpose} from {name}"
         
-        msg.html = f"""
+        html_body = f"""
             <div style="font-family: Arial, sans-serif; padding: 25px; color: #18181b; background-color: #fcfbfc; max-width: 600px; border: 1px solid #e4e4e7; border-radius: 16px;">
-                <h3 style="color: #18181b; border-bottom: 1px solid #e4e4e7; padding-bottom: 12px; font-weight: bold; letter-spacing: -0.02em;">New Strategy Inbound Lead</h3>
-                <p style="margin: 10px 0;"><strong>Identity:</strong> {name}</p>
-                <p style="margin: 10px 0;"><strong>Mailing Channel:</strong> {email}</p>
-                <p style="margin: 10px 0;"><strong>Objective:</strong> <span style="background: #f4f4f5; color: #18181b; padding: 4px 12px; border-radius: 50px; font-size: 0.85rem; font-weight: 600; border: 1px solid #e4e4e7;">{purpose}</span></p>
-                <div style="background: #ffffff; padding: 18px; border-radius: 12px; margin-top: 20px; border: 1px solid #e4e4e7; box-shadow: 0 4px 12px rgba(0,0,0,0.01);">
-                    <p style="margin: 0; line-height: 1.6; color: #71717a; font-style: italic;">"{message}"</p>
+                <h3 style="color: #18181b; border-bottom: 1px solid #e4e4e7; padding-bottom: 12px; font-weight: bold;">New Inbound Message</h3>
+                <p><strong>Name:</strong> {name}</p>
+                <p><strong>Sender Email:</strong> {email}</p>
+                <p><strong>Purpose:</strong> {purpose}</p>
+                <div style="background: #ffffff; padding: 18px; border-radius: 12px; margin-top: 15px; border: 1px solid #e4e4e7;">
+                    <p style="margin: 0; line-height: 1.6; color: #333;">{message}</p>
                 </div>
-                <br>
-                <p style="font-size: 0.75rem; color: #a1a1aa; margin-top: 15px;">Automated stream from TutorFlow Core Desk.</p>
             </div>
         """
         
-        # Dispatch background mail safely
-        # thr = threading.Thread(target=send_async_email, args=[app, msg])
-        # thr.start()
         # Resend ke through tutorflowonline@gmail.com ko notify karein
         threading.Thread(
             target=send_resend_email,
             args=("tutorflowonline@gmail.com", subject, html_body),
             daemon=True
         ).start()
+        
         flash("Your message has been sent successfully! We will get back to you shortly.", "success")
         return redirect('/contact')
         
