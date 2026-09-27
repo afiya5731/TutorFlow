@@ -1042,7 +1042,7 @@ def delete_teacher_account():
         db.session.commit()
         
         session.clear()
-        flash("✨ Account and all records purged successfully.", "success")
+        flash("✨ Account and all records deleted successfully.", "success")
         return redirect('/')
         
     except Exception as e:
