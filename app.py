@@ -400,16 +400,35 @@ def notify_via_whatsapp(phone, parent_name, subject, parent_phone):
         print(f"Error: {e}")
 
 
+import re
+
 @app.route('/send_request/<int:t_id>', methods=['POST'])
 def send_request(t_id):
     if request.method == 'POST':
-        p_name = request.form.get('parent_name')
-        p_phone = request.form.get('parent_phone')
-        p_msg = request.form.get('message')
+        p_name = request.form.get('parent_name', '').strip()
+        p_phone = request.form.get('parent_phone', '').strip()
+        p_msg = request.form.get('message', '').strip()
 
+        # --- SPAM FILTERS ---
+        # 1. Check if name contains only numbers or is too long/short
+        if len(p_name) < 3 or len(p_name) > 50 or bool(re.search(r'\d', p_name)):
+            flash("❌ Invalid name format. Please use real names.", "danger")
+            return redirect('/#directory')
+            
+        # 2. Check if phone is exactly 10 digits (cleaning any spaces/plus signs)
+        clean_phone = re.sub(r'\D', '', p_phone)
+        if len(clean_phone) != 10:
+            flash("❌ Please enter a valid 10-digit mobile number.", "danger")
+            return redirect('/#directory')
+
+        # Limit message length to prevent database bloat
+        if len(p_msg) > 300:
+            p_msg = p_msg[:300] + "..."
+
+        # If it passes, save to database
         new_entry = ParentRequest(
             parent_name=p_name, 
-            parent_phone=p_phone, 
+            parent_phone=clean_phone, 
             message=p_msg, 
             teacher_id=t_id
         )
@@ -418,14 +437,16 @@ def send_request(t_id):
 
         teacher = Teacher.query.get(t_id)
 
-        if teacher.phone:
+        # Proceed with WhatsApp notification
+        if teacher and teacher.phone:
             thread = threading.Thread(
                 target=notify_via_whatsapp, 
-                args=(teacher.phone, p_name, teacher.subject, p_phone) 
+                args=(teacher.phone, p_name, teacher.subject, clean_phone) 
             )
             thread.start()
 
-        return "<h3>Request Sent Successfully! <a href='/'>Go Back</a></h3>"
+        flash("✅ Request sent successfully! The tutor will contact you soon.", "success")
+        return redirect('/#directory')
 
 
 @app.route('/update_status/<int:req_id>/<string:new_status>')
