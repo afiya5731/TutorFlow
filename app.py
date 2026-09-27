@@ -209,8 +209,10 @@ def send_resend_email(to_email, subject, html_content):
         "Content-Type": "application/json"
     }
     payload = {
-        "from": "TutorFlow <onboarding@resend.dev>",
+        # Outgoing Display Sender (Iske liye inbox hona zaroori nahi hai)
+        "from": "TutorFlow <noreply@tutorflow.online>",
         "to": [to_email],
+        # User ka reply seedhe aapke real Gmail par aayega:
         "reply_to": "tutorflowonline@gmail.com",
         "subject": subject,
         "html": html_content
