@@ -1002,9 +1002,14 @@ def contact():
         """
         
         # Dispatch background mail safely
-        thr = threading.Thread(target=send_async_email, args=[app, msg])
-        thr.start()
-        
+        # thr = threading.Thread(target=send_async_email, args=[app, msg])
+        # thr.start()
+        # Resend ke through tutorflowonline@gmail.com ko notify karein
+        threading.Thread(
+            target=send_resend_email,
+            args=("tutorflowonline@gmail.com", subject, html_body),
+            daemon=True
+        ).start()
         flash("Your message has been sent successfully! We will get back to you shortly.", "success")
         return redirect('/contact')
         
