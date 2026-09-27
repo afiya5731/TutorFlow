@@ -498,14 +498,25 @@
                     </div>
                     <form action="/send_request/{{ teacher.id }}" method="POST">
                         <div class="modal-body d-flex flex-column gap-3 text-start">
-                            <div>
-                                <label class="small fw-bold mb-1" style="color:var(--modal-text);">Name</label>
-                                <input type="text" name="parent_name" class="form-control" style="padding:12px; border-radius:10px; background-color: var(--input-bg); color: var(--text-main);" placeholder="Enter your full name" required>
-                            </div>
-                            <div>
-                                <label class="small fw-bold mb-1" style="color:var(--modal-text);">Mobile Number</label>
-                                <input type="text" name="parent_phone" class="form-control" style="padding:12px; border-radius:10px; background-color: var(--input-bg); color: var(--text-main);" placeholder="Enter 10-digit number" required>
-                            </div>
+<!-- index.html me modal body ke andar replace karein -->
+                        <div>
+                            <label class="small fw-bold mb-1" style="color:var(--modal-text);">Name</label>
+                            <input type="text" name="parent_name" class="form-control" 
+                                   pattern="[a-zA-Z\s]{3,50}" 
+                                   title="Name should only contain letters and spaces (min 3 characters)."
+                                   minlength="3" maxlength="50"
+                                   style="padding:12px; border-radius:10px; background-color: var(--input-bg); color: var(--text-main);" 
+                                   placeholder="Enter your full name" required>
+                        </div>
+                        <div>
+                            <label class="small fw-bold mb-1" style="color:var(--modal-text);">Mobile Number</label>
+                            <input type="text" name="parent_phone" class="form-control" 
+                                   pattern="\d{10}" 
+                                   title="Please enter exactly 10 digits without any spaces or symbols."
+                                   minlength="10" maxlength="10"
+                                   style="padding:12px; border-radius:10px; background-color: var(--input-bg); color: var(--text-main);" 
+                                   placeholder="Enter 10-digit number" required>
+                        </div>
                             <div>
                                 <label class="small fw-bold mb-1" style="color:var(--modal-text);">Message</label>
                                 <textarea name="message" class="form-control" rows="3" style="border-radius:10px; background-color: var(--input-bg); color: var(--text-main);" placeholder="Describe subject criteria or grade targets..."></textarea>
