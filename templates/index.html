@@ -180,6 +180,87 @@
             transform: translateY(-3px) scale(1.02);
             box-shadow: 0 12px 30px rgba(168, 85, 247, 0.65);
         }
+    /* 💎 LUXURY EMERALD-PURPLE THANK YOU APPRECIATION CARD */
+    .appreciation-banner {
+        position: relative;
+        background: radial-gradient(120% 120% at 50% 0%, rgba(16, 185, 129, 0.22) 0%, rgba(15, 23, 42, 0.96) 100%);
+        border: 1px solid rgba(52, 211, 153, 0.35);
+        border-radius: 28px;
+        padding: 45px 30px;
+        box-shadow: 0 25px 60px -15px rgba(5, 150, 105, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        overflow: hidden;
+        transition: all 0.35s ease;
+    }
+
+    [data-bs-theme="light"] .appreciation-banner {
+        background: radial-gradient(120% 120% at 50% 0%, rgba(16, 185, 129, 0.18) 0%, rgba(248, 250, 252, 0.98) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        box-shadow: 0 20px 50px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .appreciation-banner:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 30px 70px -12px rgba(5, 150, 105, 0.4);
+        border-color: rgba(52, 211, 153, 0.55);
+    }
+
+    .thankyou-heart-badge {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.45) 100%);
+        border: 1px solid rgba(52, 211, 153, 0.5);
+        color: #34d399;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        box-shadow: 0 0 20px rgba(52, 211, 153, 0.35);
+        animation: pulseHeart 3s ease-in-out infinite;
+    }
+
+    @keyframes pulseHeart {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 18px rgba(52, 211, 153, 0.3); }
+        50% { transform: scale(1.08); box-shadow: 0 0 28px rgba(52, 211, 153, 0.6); }
+    }
+
+    .thankyou-heading {
+        font-size: 1.55rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #a7f3d0 0%, #34d399 50%, #10b981 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    [data-bs-theme="light"] .thankyou-heading {
+        background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .thankyou-text {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: rgba(226, 232, 240, 0.9);
+        max-width: 820px;
+        margin: 0 auto;
+    }
+
+    [data-bs-theme="light"] .thankyou-text {
+        color: #334155;
+    }
+
+    .thankyou-highlight {
+        color: #6ee7b7;
+        font-weight: 600;
+    }
+
+    [data-bs-theme="light"] .thankyou-highlight {
+        color: #047857;
+    }
 </style>
 {% endblock %}
 
@@ -485,7 +566,23 @@
             </div>
         </div>
     </section>
-
+<!-- 💖 LUXURY TUTOR APPRECIATION SECTION -->
+    <section class="container my-5 pb-3">
+        <div class="appreciation-banner text-center position-relative">
+            <!-- TOP ICON & TITLE -->
+            <div class="d-inline-flex align-items-center justify-content-center gap-2 mb-3">
+                <div class="thankyou-heart-badge">
+                    <i class="bi bi-heart-fill"></i>
+                </div>
+                <h3 class="thankyou-heading m-0">Thank You</h3>
+            </div>
+            
+            <!-- APPRECIATION MESSAGE -->
+            <p class="thankyou-text px-2">
+                If you're a tutor using <span class="thankyou-highlight">TutorFlow</span> — or even just exploring it — we appreciate you. You're shaping minds every day. We're just here to support the hustle.
+            </p>
+        </div>
+    </section>
     <!-- MODALS FOR CALLBACK -->
     {% if teachers %}
         {% for teacher in teachers %}
@@ -532,3 +629,5 @@
         {% endfor %}
     {% endif %}
 {% endblock %}
+
+
