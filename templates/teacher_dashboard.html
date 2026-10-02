@@ -298,54 +298,14 @@
     --text-muted: #94a3b8;
     --border-color: rgba(255, 255, 255, 0.08);
 }
-        /* 📱 LUXURIOUS MOBILE STICKY TOPBAR */
-        .mobile-sticky-topbar {
-            position: sticky;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1050;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 16px;
-            margin: -1.2rem -1.2rem 1.2rem -1.2rem;
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
 
-        @media (max-width: 768px) {
-            .dashboard-header {
-                margin-top: 0.5rem;
-                margin-bottom: 1.2rem !important;
-            }
-            .mobile-sticky-topbar .dropdown-hub-menu {
-                right: 12px;
-                top: 55px;
-            }
-        }
     </style>
 {% endblock %}
 
 {% block content %}
 
 <!-- 📱 COMPACT STICKY MOBILE TOP BAR (Logo + Brand + Settings Gear) -->
-<div class="mobile-sticky-topbar d-md-none">
-    <div class="d-flex align-items-center gap-2">
-        <img src="{{ url_for('static', filename='favicon.png') }}" alt="Logo" style="width:28px; height:28px;">
-        <span class="fw-bold fs-5 text-main">Tutor<span style="color: #a855f7;">Flow</span></span>
-    </div>
 
-    <!-- SETTINGS GEAR ON TOP RIGHT -->
-    <div class="custom-dropdown">
-        <button class="btn btn-settings-hub shadow-sm" type="button" onclick="toggleDropdownMenu(event)">
-            <i class="bi bi-gear-fill fs-5"></i>
-        </button>
-    </div>
-</div>
 
 <!-- 💻 DESKTOP & WORKSPACE HEADER -->
 <header class="dashboard-header mb-4 align-items-center">
