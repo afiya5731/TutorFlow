@@ -293,8 +293,7 @@
             border-color: #a855f7;
             color: #a855f7;
         }
-        /* 📱 LUXURIOUS MOBILE STICKY TOPBAR */
-        /* 📱 CONSTANT MOBILE STICKY TOPBAR */
+  /* 📱 CONSTANT MOBILE STICKY TOPBAR */
         .mobile-sticky-topbar {
             position: sticky;
             top: 0;
@@ -304,8 +303,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 16px;
-            margin: -1.2rem -1.2rem 1.2rem -1.2rem;
+            padding: 10px 18px;
             background: var(--card-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -363,6 +361,7 @@
         @media (min-width: 769px) { 
             .mobile-sticky-topbar { display: none !important; } 
         }
+        [data-theme="light"] .text-main{ color: #00000 !important; }
     </style>
     {% block extra_css %}{% endblock %}
 <body>
@@ -370,7 +369,7 @@
     <div class="mobile-sticky-topbar d-md-none">
         <a href="/" class="d-flex align-items-center gap-2 text-decoration-none">
             <img src="{{ url_for('static', filename='favicon.png') }}" alt="TutorFlow Logo" style="width:28px; height:28px;">
-            <span class="fw-bold fs-5 text-main">Tutor<span style="color: #a855f7;">Flow</span></span>
+            <span class="fw-bold fs-5 text-main">Tutor<span style="color: #ffffff;">Flow</span></span>
         </a>
 
         <div class="position-relative">
