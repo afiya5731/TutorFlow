@@ -361,7 +361,9 @@
         @media (min-width: 769px) { 
             .mobile-sticky-topbar { display: none !important; } 
         }
-        [data-theme="light"] .text-main{ color: #00000 !important; }
+        .text-main{
+            color: #ffffff;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 <body>
@@ -369,7 +371,7 @@
     <div class="mobile-sticky-topbar d-md-none">
         <a href="/" class="d-flex align-items-center gap-2 text-decoration-none">
             <img src="{{ url_for('static', filename='favicon.png') }}" alt="TutorFlow Logo" style="width:28px; height:28px;">
-            <span class="fw-bold fs-5 text-main">Tutor<span style="color: #ffffff;">Flow</span></span>
+            <span class="fw-bold fs-5 text-main">Tutor<span style="color: #a855f7;">Flow</span></span>
         </a>
 
         <div class="position-relative">
