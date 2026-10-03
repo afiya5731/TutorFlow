@@ -221,6 +221,7 @@
         justify-content: center;
         font-size: 1.2rem;
         box-shadow: 0 0 22px rgba(168, 85, 247, 0.4);
+        animation: pulseHeart 3s ease-in-out infinite;
     }
 
     .thankyou-heading {
@@ -255,6 +256,10 @@
     .thankyou-highlight {
         color: #c084fc;
         font-weight: 700;
+    }
+    @keyframes pulseHeart {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 18px rgba(52, 211, 153, 0.3); }
+        50% { transform: scale(1.08); box-shadow: 0 0 28px rgba(52, 211, 153, 0.6); }
     }
 </style>
 {% endblock %}
