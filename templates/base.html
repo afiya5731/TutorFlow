@@ -24,24 +24,26 @@
             --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             --text-main: #0f172a;
             --text-muted: #475569;
-            --glass-bg: rgba(255, 255, 255, 0.72);
-            --glass-border: rgba(241, 245, 249, 1);
+            --glass-bg: rgba(255, 255, 255, 0.78);
+            --glass-border: rgba(226, 232, 240, 0.9);
             --input-bg: #ffffff;
             --card-sub: #ffffff;
-            --shadow-glow: rgba(99, 102, 241, 0.04);
+            --shadow-glow: rgba(99, 102, 241, 0.08);
             --modal-text: #0f172a;
+            --nav-mob-bg: rgba(255, 255, 255, 0.94);
         }
 
         :root[data-bs-theme="dark"] {
             --bg-gradient: radial-gradient(circle at top right, #1e1b4b 0%, #09090b 100%);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --glass-bg: rgba(20, 20, 25, 0.65);
+            --glass-bg: rgba(15, 17, 26, 0.78);
             --glass-border: rgba(255, 255, 255, 0.08);
             --input-bg: rgba(15, 15, 20, 0.6);
             --card-sub: #141416;
-            --shadow-glow: rgba(168, 85, 247, 0.15);
+            --shadow-glow: rgba(168, 85, 247, 0.2);
             --modal-text: #f8fafc;
+            --nav-mob-bg: rgba(11, 14, 23, 0.96);
         }
 
         body {
@@ -51,34 +53,258 @@
             color: var(--text-main);
             transition: all 0.3s ease;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
+        /* --- 🌟 NAVBAR STYLING --- */
         .glass-nav {
             background: var(--glass-bg) !important;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--glass-border);
-            padding: 16px 0 !important; /* Spacing top & bottom fix */
+            padding: 12px 0 !important;
+            z-index: 1040;
         }
 
-        /* Ensure navbar brand has vertical alignment */
         .navbar-brand {
             padding-top: 4px !important;
             padding-bottom: 4px !important;
             display: inline-flex !important;
             align-items: center !important;
+            text-decoration: none;
         }
 
         .theme-toggle-btn {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             color: var(--text-main);
-            padding: 8px 14px;
-            border-radius: 100px;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
         }
 
+        .theme-toggle-btn:hover {
+            transform: scale(1.08) rotate(15deg);
+            border-color: #a855f7;
+            color: #a855f7;
+        }
+
+        /* --- 📱 ANIMATED HAMBURGER TO CROSS (X) BUTTON --- */
+        .hamburger-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-line {
+            width: 20px;
+            height: 2px;
+            background: var(--text-main);
+            border-radius: 2px;
+            transition: all 0.35s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        }
+
+        /* Active Cross (X) State */
+        .hamburger-btn.active .line-1 {
+            transform: translateY(7px) rotate(45deg);
+            background: #a855f7;
+        }
+
+        .hamburger-btn.active .line-2 {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .hamburger-btn.active .line-3 {
+            transform: translateY(-7px) rotate(-45deg);
+            background: #a855f7;
+        }
+
+        /* --- 📱 MOBILE MENU OVERLAY SLIDE-DOWN --- */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                position: fixed;
+                top: 65px;
+                left: 0;
+                right: 0;
+                height: calc(100vh - 65px);
+                background: var(--nav-mob-bg);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                padding: 24px 20px 40px 20px;
+                overflow-y: auto;
+                border-bottom: 1px solid var(--glass-border);
+                display: flex !important;
+                flex-direction: column;
+                justify-content: flex-start;
+                transform: translateY(-120%);
+                opacity: 0;
+                pointer-events: none;
+                transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+                z-index: 1030;
+            }
+
+            .navbar-collapse.show {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .navbar-nav {
+                width: 100%;
+                gap: 8px !important;
+                align-items: stretch !important;
+            }
+
+            .navbar-nav .nav-link {
+                padding: 12px 16px !important;
+                border-radius: 14px;
+                font-weight: 600;
+                font-size: 1.05rem;
+                display: flex;
+                align-items: center;
+                transition: all 0.2s ease;
+            }
+
+            .navbar-nav .nav-link:hover {
+                background: rgba(168, 85, 247, 0.12);
+                color: #a855f7 !important;
+                transform: translateX(4px);
+            }
+
+            .mobile-divider {
+                height: 1px;
+                background: var(--glass-border);
+                margin: 15px 0;
+            }
+        }
+
+        /* --- 💎 ORIGINAL BRAND LOGO & TEXT ANIMATION --- */
+        .brand-text {
+            display: inline-flex;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.45rem;
+            letter-spacing: -0.03em;
+            animation: textReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+            opacity: 0;
+        }
+
+        .brand-part-tutor {
+            color: #1e1b4b;
+            transition: all 0.3s ease;
+        }
+
+        [data-bs-theme="dark"] .brand-part-tutor {
+            color: #ffffff;
+        }
+
+        .brand-part-flow {
+            background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #e879f9 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: purpleGradientShine 3s ease infinite;
+            filter: drop-shadow(0 2px 8px rgba(168, 85, 247, 0.35));
+            font-weight: 800;
+        }
+
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .navbar-logo-img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            animation: logo3DEntrance 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+        }
+
+        @keyframes logo3DEntrance {
+            0% {
+                opacity: 0;
+                transform: scale(0.2) rotate(-180deg);
+                filter: drop-shadow(0 0 0px rgba(168, 85, 247, 0));
+            }
+            70% {
+                transform: scale(1.18) rotate(12deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+                filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.65));
+            }
+        }
+
+        @keyframes textReveal {
+            0% {
+                opacity: 0;
+                transform: translateX(-12px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes purpleGradientShine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .brand-animate:hover .navbar-logo-img {
+            transform: rotate(20deg) scale(1.15);
+            filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.95));
+        }
+
+        .brand-animate:hover .brand-part-tutor {
+            color: #e879f9;
+        }
+
+        /* --- 🚀 MODERN WEB SCROLL & REVEAL ANIMATIONS --- */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Ambient Card Floating Animation */
+        .float-subtle {
+            animation: floatSlow 5s ease-in-out infinite;
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-7px); }
+        }
+
+        /* Other Base Shared UI Elements */
         .glass-card {
             background: var(--glass-bg);
             backdrop-filter: blur(16px);
@@ -118,20 +344,27 @@
             padding: 14px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2);
+            transition: all 0.25s ease;
+        }
+
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(168, 85, 247, 0.45);
         }
 
         .btn-nav-accent {
-            border: 1px solid #06b6d4 !important;
-            background: rgba(6, 182, 212, 0.05) !important;
+            border: 1px solid rgba(6, 182, 212, 0.5) !important;
+            background: rgba(6, 182, 212, 0.08) !important;
             color: #06b6d4 !important;
             font-weight: 600;
-            border-radius: 10px;
+            border-radius: 12px;
+            transition: all 0.25s ease;
         }
 
         .btn-nav-accent:hover {
             background: #06b6d4 !important;
             color: #ffffff !important;
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+            box-shadow: 0 0 18px rgba(6, 182, 212, 0.4);
         }
 
         .btn-outline-glass {
@@ -141,6 +374,7 @@
             border-radius: 12px;
             font-weight: 600;
             padding: 12px;
+            transition: all 0.2s ease;
         }
 
         .btn-outline-glass:hover {
@@ -172,123 +406,10 @@
         .c-amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
         .c-cyan { background: linear-gradient(135deg, #06b6d4, #0891b2); }
         .c-rose { background: linear-gradient(135deg, #f43f5e, #e11d48); }
-        /* ========================================================
-   👑 PURPLE SHADE PREMIUM BRAND TYPOGRAPHY & ANIMATIONS
-   ======================================================== */
-
-        /* 1. BRAND TEXT TYPOGRAPHY */
-        .brand-text {
-            display: inline-flex;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-weight: 800;
-            font-size: 1.55rem;
-            letter-spacing: -0.03em;
-            animation: textReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
-            opacity: 0;
-        }
-
-        /* "Tutor" - Deep Royal Purple / Indigo Shade */
-        .brand-part-tutor {
-            color: #fcf8ff; /* Dark Purple Accent */
-            transition: all 0.3s ease;
-            text-shadow: 0 0 15px rgba(126, 34, 206, 0.2);
-        }
-
-
-
-        /* "Tutor" - Light mode mein Dark Slate/Violet (100% Readable) */
-        .brand-part-tutor {
-            color: #1e1b4b; /* Deep Indigo - Light mode par ekdum clear dikhega */
-            transition: all 0.3s ease;
-        }
-
-        /* "Tutor" - Dark mode mein Lavender Glow */
-        [data-bs-theme="dark"] .brand-part-tutor {
-            color: #ffffff;
-        }
-
-
-        /* "Flow" - Electric Purple to Pinkish Lavender Gradient */
-        .brand-part-flow {
-            background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #e879f9 100%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: purpleGradientShine 3s ease infinite;
-            filter: drop-shadow(0 2px 8px rgba(168, 85, 247, 0.35));
-            font-weight: 800;
-        }
-
-        /* 2. LOGO ENTRANCE & GLOW */
-        .logo-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .navbar-logo-img {
-            width: 38px;
-            height: 38px;
-            object-fit: contain;
-            animation: logo3DEntrance 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
-        }
-
-        /* 3. KEYFRAME ANIMATIONS */
-        @keyframes logo3DEntrance {
-            0% {
-                opacity: 0;
-                transform: scale(0.2) rotate(-180deg);
-                filter: drop-shadow(0 0 0px rgba(168, 85, 247, 0));
-            }
-            70% {
-                transform: scale(1.18) rotate(12deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) rotate(0deg);
-                filter: drop-shadow(0 0 12px rgba(168, 85, 247, 0.65));
-            }
-        }
-
-        @keyframes textReveal {
-            0% {
-                opacity: 0;
-                transform: translateX(-12px) scale(0.95);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-        }
-
-        @keyframes purpleGradientShine {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* 4. HOVER INTERACTION */
-        .brand-animate:hover .navbar-logo-img {
-            transform: rotate(20deg) scale(1.15);
-            filter: drop-shadow(0 0 18px rgba(168, 85, 247, 0.95));
-        }
-
-        .brand-animate:hover .brand-part-tutor {
-            color: #e879f9;
-            text-shadow: 0 0 12px rgba(232, 121, 249, 0.6);
-        }
-
-        .brand-animate:hover .brand-part-flow {
-            animation: purpleGradientShine 1s linear infinite;
-        }
 
         .text-main {
             color: var(--text-main) !important;
         }
-
-
-        
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -296,59 +417,91 @@
 
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg glass-nav sticky-top">
-        <div class="container">
-<!-- PREMIUM ANIMATED BRAND LOGO & TEXT -->
-<a class="navbar-brand d-flex align-items-center gap-2 brand-animate" href="/">
-    <div class="logo-wrapper">
-        <img src="{{ url_for('static', filename='favicon.png') }}" alt="TutorFlow Logo" class="navbar-logo-img">
-    </div>
-    <span class="brand-text">
-        <span class="brand-part-tutor">Tutor</span><span class="brand-part-flow">Flow</span>
-    </span>
-</a>
+        <div class="container d-flex justify-content-between align-items-center">
+            
+            <!-- PREMIUM ANIMATED BRAND LOGO & TEXT -->
+            <a class="navbar-brand d-flex align-items-center gap-2 brand-animate" href="/">
+                <div class="logo-wrapper">
+                    <img src="{{ url_for('static', filename='favicon.png') }}" alt="TutorFlow Logo" class="navbar-logo-img">
+                </div>
+                <span class="brand-text">
+                    <span class="brand-part-tutor">Tutor</span><span class="brand-part-flow">Flow</span>
+                </span>
+            </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <!-- MOBILE ACTIONS (THEME TOGGLE + 3-LINE ANIMATED HAMBURGER) -->
+            <div class="d-flex align-items-center gap-2 d-lg-none">
+                <button class="theme-toggle-btn shadow-sm" onclick="toggleTheme()" aria-label="Toggle Theme">
+                    <i class="bi bi-moon-stars-fill" id="themeIconMob"></i>
+                </button>
+                <button class="hamburger-btn" id="mobileMenuBtn" type="button" aria-label="Toggle Navigation">
+                    <span class="hamburger-line line-1"></span>
+                    <span class="hamburger-line line-2"></span>
+                    <span class="hamburger-line line-3"></span>
+                </button>
+            </div>
+
+            <!-- COLLAPSIBLE NAVIGATION LINKS -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center gap-3">
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/#features">ERP Features</a></li>
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/#directory">Directory</a></li>
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/about">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/pricing">Pricing</a></li>
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/contact">Contact</a></li>
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+                    <li class="nav-item"><a class="nav-link text-main" href="/"><i class="bi bi-house-door me-2 d-lg-none text-purple"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-main" href="/#features"><i class="bi bi-stars me-2 d-lg-none text-purple"></i>ERP Features</a></li>
+                    <li class="nav-item"><a class="nav-link text-main" href="/#directory"><i class="bi bi-compass me-2 d-lg-none text-purple"></i>Directory</a></li>
+                    <li class="nav-item"><a class="nav-link text-main" href="/about"><i class="bi bi-info-circle me-2 d-lg-none text-purple"></i>About Us</a></li>
+                    <li class="nav-item"><a class="nav-link text-main" href="/pricing"><i class="bi bi-tags me-2 d-lg-none text-purple"></i>Pricing</a></li>
+                    <li class="nav-item"><a class="nav-link text-main" href="/contact"><i class="bi bi-envelope me-2 d-lg-none text-purple"></i>Contact</a></li>
                     
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-main fw-medium btn btn-nav-accent btn-sm px-3 w-100 " href="#" role="button" data-bs-toggle="dropdown">Portal Access</a>
+                    <div class="mobile-divider d-lg-none"></div>
+
+                    <!-- PORTAL ACCESS DROPDOWN (DESKTOP) / BUTTON GROUP (MOBILE) -->
+                    <li class="nav-item dropdown d-none d-lg-block">
+                        <a class="nav-link dropdown-toggle text-main fw-medium btn btn-nav-accent btn-sm px-3 w-100" href="#" role="button" data-bs-toggle="dropdown">
+                            Portal Access
+                        </a>
                         <ul class="dropdown-menu dropdown-menu-end modal-content-glass p-2">
-                            <li><a class="dropdown-item text-main rounded-2" href="/student-login"><i class="bi bi-person me-2"></i>Student Portal</a></li>
-                            <li><a class="dropdown-item text-main rounded-2" href="/teacher-login"><i class="bi bi-person-workspace me-2"></i>Teacher Console</a></li>
+                            <li><a class="dropdown-item text-main rounded-2" href="/student-login"><i class="bi bi-person me-2 text-primary"></i>Student Portal</a></li>
+                            <li><a class="dropdown-item text-main rounded-2" href="/teacher-login"><i class="bi bi-person-workspace me-2 text-purple"></i>Teacher Console</a></li>
                         </ul>
                     </li>
 
+                    <!-- Mobile Specific Portals Display -->
+                    <li class="nav-item d-lg-none">
+                        <a class="nav-link text-main" href="/student-login">
+                            <i class="bi bi-person-fill me-2 text-primary"></i>Student Portal
+                        </a>
+                    </li>
+                    <li class="nav-item d-lg-none">
+                        <a class="nav-link text-purple fw-bold" href="/teacher-login">
+                            <i class="bi bi-person-workspace me-2 text-purple"></i>Teacher Console
+                        </a>
+                    </li>
 
-                    <li class="nav-item">
-                        <button class="theme-toggle-btn shadow-sm" onclick="toggleTheme()">
+                    <!-- Desktop Theme Toggle -->
+                    <li class="nav-item d-none d-lg-block">
+                        <button class="theme-toggle-btn shadow-sm" onclick="toggleTheme()" aria-label="Toggle Theme">
                             <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
                         </button>
                     </li>
                 </ul>
             </div>
+
         </div>
     </nav>
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <div class="container mt-3">
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show rounded-4 border-0 shadow-sm" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container mt-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show rounded-4 border-0 shadow-sm" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
         </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
+      {% endif %}
+    {% endwith %}
+
     <!-- MAIN DYNAMIC CONTENT -->
     {% block content %}{% endblock %}
 
@@ -356,9 +509,11 @@
     <footer class="glass-nav text-center py-4 mt-5">
         <p class="m-0 small text-muted">&copy; 2026 TutorFlow | <a href="/about" class="text-main text-decoration-none fw-semibold">Smart Coaching & Tuition Management ERP</a> | Crafted with ❤️ by an AI Engineer</p>
     </footer>
+
     <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // --- 1. THEME PERSISTENCE ENGINE ---
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-bs-theme', savedTheme);
         updateToggleUI(savedTheme);
@@ -372,15 +527,62 @@
         }
 
         function updateToggleUI(theme) {
-            const icon = document.getElementById('themeIcon');
-            if (icon) {
-                if (theme === 'dark') {
-                    icon.className = 'bi bi-sun-fill text-warning';
-                } else {
-                    icon.className = 'bi bi-moon-stars-fill text-primary';
-                }
-            }
+            const iconDesktop = document.getElementById('themeIcon');
+            const iconMobile = document.getElementById('themeIconMob');
+            const iconClass = theme === 'dark' ? 'bi bi-sun-fill text-warning' : 'bi bi-moon-stars-fill text-primary';
+            if (iconDesktop) iconDesktop.className = iconClass;
+            if (iconMobile) iconMobile.className = iconClass;
         }
+
+        // --- 2. SMOOTH 3-LINES TO CROSS (X) HAMBURGER TOGGLER ---
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.getElementById('navbarNav');
+
+        if (menuBtn && navMenu) {
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menuBtn.classList.toggle('active');
+                navMenu.classList.toggle('show');
+                document.body.style.overflow = navMenu.classList.contains('show') ? 'hidden' : '';
+            });
+
+            // Close menu when clicking outside or clicking any nav link
+            document.querySelectorAll('#navbarNav .nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    menuBtn.classList.remove('active');
+                    navMenu.classList.remove('show');
+                    document.body.style.overflow = '';
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!navMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+                    menuBtn.classList.remove('active');
+                    navMenu.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        // --- 3. MODERN INTERSECTION OBSERVER SCROLL REVEAL ANIMATIONS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const targets = document.querySelectorAll('.glass-card, .stat-card, .appreciation-banner, .feature-box, header h1, header p');
+            
+            targets.forEach(el => el.classList.add('reveal-on-scroll'));
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, {
+                threshold: 0.12,
+                rootMargin: '0px 0px -40px 0px'
+            });
+
+            targets.forEach(target => observer.observe(target));
+        });
     </script>
     {% block extra_js %}{% endblock %}
 </body>
