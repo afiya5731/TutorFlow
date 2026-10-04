@@ -1466,9 +1466,9 @@ def delete_quiz(quiz_id):
 @app.route('/edit-student/<int:student_id>', methods=['POST'])
 def edit_student(student_id):
     if 'teacher_id' not in session:
-        return redirect('/teacher-login')[cite: 17]
+        return redirect('/teacher-login'}
         
-    t_id = session['teacher_id'][cite: 17]
+    t_id = session['teacher_id']
     student = Student.query.filter_by(id=student_id, teacher_id=t_id).first_or_404()
     
     student.name = request.form.get('name', '').strip()
@@ -1481,9 +1481,9 @@ def edit_student(student_id):
         except ValueError:
             pass
 
-    db.session.commit()[cite: 17]
-    flash("✨ Student details updated successfully!", "success")[cite: 17]
-    return redirect('/my-students')[cite: 17]
+    db.session.commit()
+    flash("✨ Student details updated successfully!", "success")
+    return redirect('/my-students')
 
 if __name__ == '__main__':
     app.run(debug=True)
