@@ -683,7 +683,7 @@ def my_students():
     
     paid_ids = [r.student_id for r in FeeRecord.query.filter_by(
         teacher_id=t_id, month=current_month, status='Paid').all()]
-
+    batches_set = sorted(list(set([s.grade for s in students_list if s.grade])))
     for s in students_list:
         s.is_paid_this_month = s.id in paid_ids 
         
@@ -706,7 +706,7 @@ def my_students():
             s.calc_attendance = 0 
 
     teacher = Teacher.query.get(t_id)
-    return render_template('my_students.html', students=students_list, teacher=teacher,plan=subscription_plan)
+    return render_template('my_students.html', students=students_list, teacher=teacher,batches=batches_set,plan=subscription_plan)
 
 
 @app.route('/move-to-active/<int:req_id>')
@@ -1463,7 +1463,27 @@ def delete_quiz(quiz_id):
         flash("Quiz and its submission records deleted successfully.", "info")
     return redirect('/teacher/study-material')
 
+@app.route('/edit-student/<int:student_id>', methods=['POST'])
+def edit_student(student_id):
+    if 'teacher_id' not in session:
+        return redirect('/teacher-login')[cite: 17]
+        
+    t_id = session['teacher_id'][cite: 17]
+    student = Student.query.filter_by(id=student_id, teacher_id=t_id).first_or_404()
+    
+    student.name = request.form.get('name', '').strip()
+    student.phone = request.form.get('phone', '').strip()
+    student.grade = request.form.get('grade', '').strip()  # Class + Batch (e.g. "Class 10 - Batch 1")
+    fee_val = request.form.get('monthly_fee', '').strip()
+    if fee_val:
+        try:
+            student.monthly_fee = float(fee_val)
+        except ValueError:
+            pass
 
+    db.session.commit()[cite: 17]
+    flash("✨ Student details updated successfully!", "success")[cite: 17]
+    return redirect('/my-students')[cite: 17]
 
 if __name__ == '__main__':
     app.run(debug=True)
