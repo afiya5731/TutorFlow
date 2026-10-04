@@ -422,6 +422,55 @@
                 }
             }
         }
+        // --- 2. SMOOTH 3-LINES TO CROSS (X) HAMBURGER TOGGLER ---
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.getElementById('navbarNav');
+
+        if (menuBtn && navMenu) {
+            menuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menuBtn.classList.toggle('active');
+                navMenu.classList.toggle('show');
+                document.body.style.overflow = navMenu.classList.contains('show') ? 'hidden' : '';
+            });
+
+            // Close menu when clicking outside or clicking any nav link
+            document.querySelectorAll('#navbarNav .nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    menuBtn.classList.remove('active');
+                    navMenu.classList.remove('show');
+                    document.body.style.overflow = '';
+                });
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!navMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+                    menuBtn.classList.remove('active');
+                    navMenu.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
+        }
+
+        // --- 3. MODERN INTERSECTION OBSERVER SCROLL REVEAL ANIMATIONS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const targets = document.querySelectorAll('.glass-card, .stat-card, .appreciation-banner, .feature-box, header h1, header p');
+            
+            targets.forEach(el => el.classList.add('reveal-on-scroll'));
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, {
+                threshold: 0.12,
+                rootMargin: '0px 0px -40px 0px'
+            });
+
+            targets.forEach(target => observer.observe(target));
+        });
     </script>
     {% block extra_js %}{% endblock %}
 </body>
