@@ -287,7 +287,46 @@
             color: var(--text-main) !important;
         }
 
+        /* --- 📱 ANIMATED HAMBURGER TO CROSS (X) BUTTON --- */
+        .hamburger-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
 
+        .hamburger-line {
+            width: 20px;
+            height: 2px;
+            background: var(--text-main);
+            border-radius: 2px;
+            transition: all 0.35s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        }
+
+        /* Active Cross (X) State */
+        .hamburger-btn.active .line-1 {
+            transform: translateY(7px) rotate(45deg);
+            background: #a855f7;
+        }
+
+        .hamburger-btn.active .line-2 {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .hamburger-btn.active .line-3 {
+            transform: translateY(-7px) rotate(-45deg);
+            background: #a855f7;
+        }
         
     </style>
     {% block extra_css %}{% endblock %}
@@ -307,17 +346,19 @@
     </span>
 </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+                <button class="hamburger-btn" id="mobileMenuBtn" type="button" aria-label="Toggle Navigation">
+                    <span class="hamburger-line line-1"></span>
+                    <span class="hamburger-line line-2"></span>
+                    <span class="hamburger-line line-3"></span>
+                </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center gap-3">
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/#features">ERP Features</a></li>
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/#directory">Directory</a></li>
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/about">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/pricing">Pricing</a></li>
-                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/contact">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/"><i class="bi bi-house-door me-2 d-lg-none text-purple"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/#features"><i class="bi bi-stars me-2 d-lg-none text-purple"></i>ERP Features</a></li>
+                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/#directory"><i class="bi bi-compass me-2 d-lg-none text-purple"></i>Directory</a></li>
+                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/about"><i class="bi bi-info-circle me-2 d-lg-none text-purple"></i>About Us</a></li>
+                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/pricing"><i class="bi bi-tags me-2 d-lg-none text-purple"></i>Pricing</a></li>
+                    <li class="nav-item"><a class="nav-link text-main fw-medium" href="/contact"><i class="bi bi-envelope me-2 d-lg-none text-purple"></i>Contact</a></li>
                     
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-main fw-medium btn btn-nav-accent btn-sm px-3 w-100 " href="#" role="button" data-bs-toggle="dropdown">Portal Access</a>
