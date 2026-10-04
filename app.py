@@ -1466,7 +1466,7 @@ def delete_quiz(quiz_id):
 @app.route('/edit-student/<int:student_id>', methods=['POST'])
 def edit_student(student_id):
     if 'teacher_id' not in session:
-        return redirect('/teacher-login'}
+        return redirect('/teacher-login')
         
     t_id = session['teacher_id']
     student = Student.query.filter_by(id=student_id, teacher_id=t_id).first_or_404()
