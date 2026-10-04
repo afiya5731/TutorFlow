@@ -746,21 +746,29 @@ def move_to_active(req_id):
     return redirect('/my-students')
 
 
-@app.route('/remove-student/<int:req_id>')
-def remove_student(req_id):
+@app.route('/remove-student/<int:student_id>')
+def remove_student(student_id):
     if 'teacher_id' not in session:
         return redirect('/teacher-login')
         
-    req = ParentRequest.query.get_or_404(req_id)
-    linked_student = Student.query.filter_by(phone=req.parent_phone).first()
+    t_id = session['teacher_id']
+    # Student verify karein ki isi teacher ka hai
+    student = Student.query.filter_by(id=student_id, teacher_id=t_id).first_or_404()
     
-    if linked_student:
-        Attendance.query.filter_by(student_id=linked_student.id).delete()
-        FeeRecord.query.filter_by(student_id=linked_student.id).delete()
-        db.session.delete(linked_student)
-    
-    db.session.delete(req)
+    # 1. Child tables clean karein
+    Attendance.query.filter_by(student_id=student.id).delete()
+    FeeRecord.query.filter_by(student_id=student.id).delete()
+    QuizSubmission.query.filter_by(student_id=student.id).delete()
+
+    # 2. Linked parent lead request bhi clean karein agar bani ho
+    if student.phone:
+        ParentRequest.query.filter_by(parent_phone=student.phone, teacher_id=t_id).delete()
+
+    # 3. Student delete karein
+    db.session.delete(student)
     db.session.commit()
+    
+    flash("✨ Student record removed successfully.", "info")
     return redirect('/my-students')
 
 
